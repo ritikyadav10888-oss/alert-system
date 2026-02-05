@@ -44,6 +44,12 @@ export const saveBookings = async (bookings: any[]): Promise<void> => {
     } else {
         // Production: Use Vercel KV
         try {
+            // Optimization: Only set if there are actual new alerts
+            const existing = await getBookings();
+            if (existing.length === cappedBookings.length &&
+                JSON.stringify(existing[0]?.id) === JSON.stringify(cappedBookings[0]?.id)) {
+                return; // Skip redundant set
+            }
             await kv.set(KV_KEY, cappedBookings);
         } catch (e) {
             console.error("KV Save Error:", e);

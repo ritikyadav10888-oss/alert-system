@@ -229,8 +229,8 @@ export default function Home() {
         if (isHistoryLoaded) {
             checkEmails();
         }
-        // 10s for real-time coverage
-        const interval = setInterval(checkEmails, 10000);
+        // 60s to stay within Vercel KV Free Tier (3000 req/day)
+        const interval = setInterval(checkEmails, 60000);
         return () => clearInterval(interval);
     }, [isLiveSync, isHistoryLoaded]);
 
