@@ -178,9 +178,25 @@ export default function Home() {
             if (data.success) {
                 if (data.alerts && data.alerts.length > 0) {
                     setSyncStatus(`Updated ${data.alerts.length} items`);
+
+                    // 🛡️ DATA HEALING: Merge new data into existing history state
+                    // This ensures that if the backend fixes a MISSING slot, it updates in real-time
+                    setBookingHistory(prev => {
+                        const newHistory = [...prev];
+                        data.alerts.forEach((a: any) => {
+                            const idx = newHistory.findIndex(h => h.id === a.id);
+                            const formatted = { ...a, timestamp: new Date(a.timestamp) };
+                            if (idx > -1) {
+                                newHistory[idx] = formatted;
+                            } else {
+                                newHistory.push(formatted);
+                            }
+                        });
+                        return newHistory;
+                    });
+
                     data.alerts.forEach((a: any) => {
                         const alertDate = new Date(a.timestamp);
-                        // A "Live Alert" is something from the last 60 minutes and NOT part of a deep scan
                         const isLive = (Date.now() - alertDate.getTime()) < 60 * 60 * 1000 && depth !== 'all';
 
                         triggerAutoAlert(
@@ -196,10 +212,6 @@ export default function Home() {
                             a.gameTime
                         );
                     });
-
-                    if (depth !== 'all') {
-                        // Regular live sync sound logic (only if any were truly new - handled by triggerAutoAlert's internal checks)
-                    }
                 } else {
                     setSyncStatus(depth === 'all' ? 'Deep Sync Complete' : 'Sync Active (Waiting)');
                 }
