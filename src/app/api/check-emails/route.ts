@@ -29,8 +29,8 @@ function cleanSlot(slot: string): string {
  * Extracts a date string from a messy slot string
  */
 function extractDateOnly(slot: string): string {
-    // Look for formats: 2026-02-06, Feb 4, 31-01-2026, etc.
-    const dateMatch = slot.match(/(\d{4}-\d{2}-\d{2})|(\d{1,2}-\d{1,2}-\d{4})|(\d{1,2}\s+\w{3},\s*\d{4})|(\w{3},?\s+\d{1,2},?\s*\d{4})/i);
+    // Look for formats: 2026-02-06, Feb 4, 31-01-2026, 06 Feb '26 etc.
+    const dateMatch = slot.match(/(\d{4}-\d{2}-\d{2})|(\d{1,2}-\d{1,2}-\d{4})|(\d{1,2}\s+\w{3},\s*\d{4})|(\w{3},?\s+\d{1,2},?\s*\d{4})|(\d{1,2}\s+\w{3}\s+'\d{2})/i);
     return dateMatch ? dateMatch[0] : "";
 }
 
@@ -40,7 +40,9 @@ function extractDateOnly(slot: string): string {
 function extractTimeOnly(slot: string): string {
     // Look for AM/PM formats
     const timeMatches = slot.match(/(\d{1,2}:\d{2}\s*(?:AM|PM)(?:\s*-\s*\d{1,2}:\d{2}\s*(?:AM|PM))?)/gi);
-    return timeMatches ? timeMatches.join(' | ') : "";
+    if (!timeMatches) return "";
+    // If we have "Date, Time | Date, Time", return "Time1 | Time2"
+    return Array.from(new Set(timeMatches)).join(' | ');
 }
 
 export async function GET(req: Request) {
