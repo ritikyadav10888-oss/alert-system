@@ -494,7 +494,7 @@ export default function Home() {
                                         </td>
                                         <td style={{ padding: '12px 10px' }}>
                                             <div style={{ fontWeight: '700', color: '#0369a1' }}>
-                                                {item.gameDate || "TBD"}
+                                                {formatGameDate(item.gameDate)}
                                             </div>
                                         </td>
                                         <td style={{ padding: '12px 10px' }}>
