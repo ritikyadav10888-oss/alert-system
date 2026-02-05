@@ -1,0 +1,351 @@
+.main {
+    min-height: 100vh;
+    padding: 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    background: #f8fafc;
+    font-family: 'Inter', sans-serif;
+}
+
+.dashboard {
+    background: white;
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    width: 100%;
+    margin: 0 auto;
+}
+
+.title {
+    font-size: 1.8rem;
+    margin-bottom: 2rem;
+    text-align: center;
+    color: #333;
+}
+
+.emailSection {
+    background: #f8f9fa;
+    padding: 1.5rem;
+    border-radius: 12px;
+    border: 1px solid #e9ecef;
+    margin-bottom: 2rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    transition: box-shadow 0.3s;
+}
+
+.emailSection:focus-within {
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.1);
+}
+
+.sectionHeader {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.emailSection h2 {
+    font-size: 1.1rem;
+    color: #495057;
+    margin: 0;
+}
+
+.monitorBtn {
+    padding: 6px 12px;
+    font-size: 0.85rem;
+    border-radius: 20px;
+    border: 1px solid #28a745;
+    background: white;
+    color: #28a745;
+    cursor: pointer;
+    font-weight: 600;
+}
+
+.monitorBtn.active {
+    background: #dc3545;
+    color: white;
+    border-color: #dc3545;
+    animation: pulse 2s infinite;
+}
+
+.emailInput {
+    padding: 12px;
+    border: 1px solid #ced4da;
+    border-radius: 8px;
+    font-family: inherit;
+    font-size: 0.95rem;
+    resize: vertical;
+}
+
+.processBtn {
+    padding: 12px;
+    background-color: #333;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.processBtn:hover {
+    background-color: #000;
+}
+
+.scanningText {
+    font-size: 0.85rem;
+    color: #666;
+    text-align: center;
+    font-style: italic;
+    animation: fade 1.5s infinite;
+}
+
+@keyframes pulse {
+    0% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0.4);
+    }
+
+    70% {
+        box-shadow: 0 0 0 10px rgba(220, 53, 69, 0);
+    }
+
+    100% {
+        box-shadow: 0 0 0 0 rgba(220, 53, 69, 0);
+    }
+}
+
+@keyframes fade {
+
+    0%,
+    100% {
+        opacity: 0.5;
+    }
+
+    50% {
+        opacity: 1;
+    }
+}
+
+.divider {
+    text-align: center;
+    color: #adb5bd;
+    font-size: 0.85rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin: 0 0 1.5rem 0;
+    position: relative;
+}
+
+.controls {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.controlGroup {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.controlGroup label {
+    font-weight: 600;
+    font-size: 0.9rem;
+    color: #555;
+}
+
+.select {
+    padding: 10px;
+    border-radius: 8px;
+    border: 1px solid #ddd;
+    font-size: 1rem;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.select:focus {
+    border-color: #0070f3;
+}
+
+.buttonGrid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 1rem;
+}
+
+.btn {
+    padding: 12px;
+    border: none;
+    border-radius: 8px;
+    color: white;
+    font-weight: 600;
+    cursor: pointer;
+    transition: transform 0.1s, opacity 0.2s;
+}
+
+.btn:active {
+    transform: scale(0.98);
+}
+
+.btnPlayo {
+    background-color: #7CB342;
+}
+
+.btnHudle {
+    background-color: #009CE3;
+}
+
+.btnDistrict {
+    background-color: #2c3e50;
+}
+
+.btnKhelomore {
+    background-color: #ee5253;
+}
+
+.info {
+    margin-top: 2rem;
+    padding-top: 1rem;
+    border-top: 1px solid #eee;
+    text-align: center;
+    color: #777;
+    font-size: 0.9rem;
+}
+
+.alertContainer {
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    pointer-events: none;
+    /* Let clicks pass through empty space */
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    padding-top: 20px;
+    width: 320px;
+    /* Constraints width for stacking */
+}
+
+/* Visibility Enhancements */
+.sportBadge {
+    display: inline-block;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    background: #f0f2f5;
+    color: #4b5563;
+}
+
+.platformTag {
+    font-weight: 800;
+    font-size: 0.85rem;
+    padding: 2px 8px;
+    border-radius: 4px;
+}
+
+.gameTime {
+    font-size: 1rem;
+    font-weight: 800;
+    color: #111827;
+}
+
+.receivedTime {
+    font-size: 0.8rem;
+    color: #6b7280;
+}
+
+.locationText {
+    font-weight: 600;
+    color: #374151;
+}
+
+.syncPulse {
+    display: inline-block;
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    margin-right: 8px;
+    animation: beacon 1.5s infinite;
+}
+
+@keyframes beacon {
+    0% {
+        transform: scale(0.8);
+        opacity: 1;
+    }
+
+    100% {
+        transform: scale(2.5);
+        opacity: 0;
+    }
+}
+
+@media (max-width: 768px) {
+    .main {
+        padding: 0.5rem;
+    }
+
+    .dashboard {
+        padding: 1.25rem 0.75rem;
+        border-radius: 12px;
+    }
+
+    .title {
+        font-size: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .emailSection {
+        padding: 1rem;
+    }
+
+    .buttonGrid {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+
+    .alertContainer {
+        width: 100%;
+        padding: 10px;
+    }
+
+    .tableContainer {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+        margin: 0 -0.5rem;
+        padding: 0 0.5rem;
+    }
+
+    .bookingTable {
+        min-width: 800px;
+        /* Force scroll for all columns */
+    }
+
+    .receivedTime,
+    .gameTime {
+        font-size: 0.85rem;
+    }
+}
+
+.tableContainer {
+    max-height: calc(100vh - 280px);
+    overflow-y: auto;
+    border: 1px solid #eaeaea;
+    border-radius: 12px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05);
+    background: white;
+    width: 100%;
+}
+
+.bookingTable {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
