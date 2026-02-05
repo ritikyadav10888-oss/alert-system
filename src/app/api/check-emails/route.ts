@@ -1,7 +1,6 @@
 import { NextResponse } from 'next/server';
 import imaps from 'imap-simple';
 import { simpleParser } from 'mailparser';
-import fs from 'fs';
 import { getBookings, saveBookings } from '@/app/utils/db';
 import { sendPushNotification } from '@/app/utils/push';
 
@@ -44,10 +43,13 @@ function extractTimeOnly(slot: string): string {
     return timeMatches ? timeMatches.join(' | ') : "";
 }
 
-export async function GET() {
+export async function GET(req: Request) {
     let connection: any;
     try {
+        console.log('[Sync] Starting Email Check...');
+
         if (!process.env.EMAIL_USER || !process.env.EMAIL_PASSWORD) {
+            console.error('[Sync] Error: Missing email credentials in environment.');
             return NextResponse.json({ success: false, message: 'Email credentials not configured' }, { status: 500 });
         }
 
@@ -63,16 +65,19 @@ export async function GET() {
             },
         };
 
+        console.log('[Sync] Connecting to IMAP...');
         connection = await imaps.connect(config);
         await connection.openBox('INBOX');
 
-        const url = new URL(NextResponse.next().url || '', 'http://localhost');
-        const depth = url.searchParams.get('depth');
+        const { searchParams } = new URL(req.url);
+        const depth = searchParams.get('depth');
         const daysToSync = depth === 'all' ? 90 : 7;
+
+        console.log(`[Sync] Syncing last ${daysToSync} days...`);
 
         const searchDate = new Date();
         searchDate.setDate(searchDate.getDate() - daysToSync);
-        const searchCriteria = [['SINCE', searchDate]];
+        const searchCriteria = [['SINCE', searchDate.toISOString()]];
 
         const fetchOptions = {
             bodies: ['HEADER.FIELDS (SUBJECT FROM DATE)'],
