@@ -35,33 +35,49 @@ function extractDateOnly(slot: string): string {
 }
 
 /**
- * Extracts time strings from a messy slot string
+ * MERGES back-to-back time slots into a single duration (e.g., 7:30-8:30)
  */
 function extractTimeOnly(slot: string): string {
-    // Look for AM/PM formats
     const timeMatches = slot.match(/(\d{1,2}:\d{2}\s*(?:AM|PM)(?:\s*-\s*\d{1,2}:\d{2}\s*(?:AM|PM))?)/gi);
     if (!timeMatches) return "";
 
-    // Sort so ranges (containing "-") come first
-    const sorted = Array.from(new Set(timeMatches)).sort((a, b) => {
-        const aHasRange = a.includes('-');
-        const bHasRange = b.includes('-');
-        if (aHasRange && !bHasRange) return -1;
-        if (!aHasRange && bHasRange) return 1;
-        return 0;
+    // Normalize to range objects
+    const ranges = Array.from(new Set(timeMatches)).map(t => {
+        const parts = t.split('-').map(p => p.trim());
+        const start = parts[0];
+        const end = parts[1] || parts[0];
+        const startT = new Date(`2000/01/01 ${start}`).getTime();
+        const endT = new Date(`2000/01/01 ${end}`).getTime();
+        return { start, end, startT, endT };
     });
 
-    const final: string[] = [];
-    for (const t of sorted) {
-        // If this is a single time, check if it's already "inside" one of our ranges
-        if (!t.includes('-')) {
-            const isInside = final.some(f => f.includes(t));
-            if (isInside) continue;
+    // Sort by start transition
+    ranges.sort((a, b) => a.startT - b.startT);
+
+    // Merge logic
+    const merged: { start: string, end: string, endT: number }[] = [];
+    for (const r of ranges) {
+        if (merged.length === 0) {
+            merged.push(r);
+            continue;
         }
-        final.push(t);
+        const last = merged[merged.length - 1];
+        // If this slot starts when the last one ends -> Merge!
+        if (r.startT === last.endT) {
+            last.end = r.end;
+            last.endT = r.endT;
+        } else if (r.startT < last.endT) {
+            // Overlapping
+            if (r.endT > last.endT) {
+                last.end = r.end;
+                last.endT = r.endT;
+            }
+        } else {
+            merged.push(r);
+        }
     }
 
-    return final.join(' | ');
+    return merged.map(m => m.start === m.end ? m.start : `${m.start} - ${m.end}`).join(' | ');
 }
 
 export async function GET(req: Request) {
@@ -299,8 +315,15 @@ export async function GET(req: Request) {
 
         return NextResponse.json({ success: true, alerts });
     } catch (error: any) {
-        console.error('IMAP Error:', error);
-        return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+        console.error('[Sync_Fatal] Sync failed:', error.message);
+        // Ensure connection is closed on error to prevent hanging handles
+        if (connection) {
+            try { connection.end(); } catch (e) { }
+        }
+        return NextResponse.json({
+            success: false,
+            message: `Sync Error: ${error.message || 'IMAP Timeout or Credential issue'}`
+        }, { status: 500 });
     } finally {
         if (connection) {
             try { connection.end(); } catch (e) { }
