@@ -19,9 +19,10 @@ export const getBookings = async (): Promise<any[]> => {
         // Production: Use Vercel KV
         try {
             const data = await kv.get<any[]>(KV_KEY);
+            if (data) console.log(`[KV_PROD_V1] Fetched ${data.length} records from KV`);
             return data || [];
         } catch (e) {
-            console.error("KV Fetch Error:", e);
+            console.error("[KV_PROD_V1] Fetch Error:", e);
             return [];
         }
     }

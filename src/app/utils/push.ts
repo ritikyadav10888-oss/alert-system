@@ -12,7 +12,9 @@ const initWebPush = () => {
     }
 
     try {
-        webpush.setVapidDetails(subject, publicKey, privateKey);
+        // VAPID keys must be URL-safe Base64 without padding (=)
+        const cleanPublicKey = publicKey.replace(/=+$/, '');
+        webpush.setVapidDetails(subject, cleanPublicKey, privateKey);
         return true;
     } catch (e) {
         console.error('Error setting VAPID details:', e);

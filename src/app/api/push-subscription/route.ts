@@ -9,12 +9,7 @@ export async function POST(req: Request) {
             return NextResponse.json({ success: false, message: 'Missing subscription or location' }, { status: 400 });
         }
 
-        saveSubscription({
-            id: Date.now().toString(),
-            subscription: data.subscription,
-            location: data.location,
-            timestamp: Date.now()
-        });
+        await saveSubscription(data.location, data.subscription);
 
         return NextResponse.json({ success: true, message: 'Subscription saved' });
     } catch (e: any) {
