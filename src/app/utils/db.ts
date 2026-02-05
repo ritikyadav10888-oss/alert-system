@@ -1,74 +1,62 @@
-import { db } from './firebase';
-import {
-    collection,
-    addDoc,
-    getDocs,
-    query,
-    orderBy,
-    limit,
-    deleteDoc,
-    doc,
-    setDoc,
-    Timestamp,
-    where
-} from 'firebase/firestore';
-import fs from 'fs';
-import path from 'path';
-
-export const isDev = process.env.NODE_ENV === 'development';
+import { adminDb } from './firebase-admin';
+import { isDev } from './db-config'; // I'll create this to share isDev logic
 
 const DB_COLLECTION = isDev ? 'bookings_test' : 'bookings';
 
 export const getBookings = async (): Promise<any[]> => {
     try {
-        const q = query(
-            collection(db, DB_COLLECTION),
-            orderBy('timestamp', 'desc'),
-            limit(1000)
-        );
-        const querySnapshot = await getDocs(q);
-        return querySnapshot.docs.map(doc => ({
-            ...doc.data(),
-            id: doc.id,
-            // Convert Firestore Timestamp to Date if needed
-            timestamp: doc.data().timestamp instanceof Timestamp ? doc.data().timestamp.toDate() : new Date(doc.data().timestamp)
-        }));
+        const snapshot = await adminDb.collection(DB_COLLECTION)
+            .orderBy('timestamp', 'desc')
+            .limit(1000)
+            .get();
+
+        return snapshot.docs.map(doc => {
+            const data = doc.data();
+            return {
+                ...data,
+                id: doc.id,
+                // Convert Admin Timestamp to Date
+                timestamp: data.timestamp?.toDate() || new Date(data.timestamp)
+            };
+        });
     } catch (e) {
-        console.error("Firestore Fetch Error:", e);
+        console.error("Firestore Admin Fetch Error:", e);
         return [];
     }
 };
 
 export const saveBookings = async (bookings: any[]): Promise<void> => {
     try {
-        const colRef = collection(db, DB_COLLECTION);
-
-        // Firestore is best used by adding individual docs, but to stay compatible with existing array-based logic:
-        // We'll treat the 'bookings' as a single source of truth or individual entries.
-        // For this system, we'll save EACH booking as a document if it doesn't exist.
+        const batch = adminDb.batch();
 
         for (const booking of bookings) {
             const bookingId = booking.id.toString();
-            const docRef = doc(db, DB_COLLECTION, bookingId);
+            const docRef = adminDb.collection(DB_COLLECTION).doc(bookingId);
 
-            await setDoc(docRef, {
+            const timestamp = booking.timestamp instanceof Date
+                ? booking.timestamp
+                : new Date(booking.timestamp);
+
+            batch.set(docRef, {
                 ...booking,
-                timestamp: booking.timestamp instanceof Date ? Timestamp.fromDate(booking.timestamp) : Timestamp.fromDate(new Date(booking.timestamp)),
-                updatedAt: Timestamp.now()
+                timestamp: timestamp,
+                updatedAt: new Date()
             }, { merge: true });
         }
+
+        await batch.commit();
     } catch (e) {
-        console.error("Firestore Save Error:", e);
+        console.error("Firestore Admin Save Error:", e);
     }
 };
 
 export const clearHistory = async (): Promise<void> => {
     try {
-        const q = query(collection(db, DB_COLLECTION));
-        const querySnapshot = await getDocs(q);
-        const deletePromises = querySnapshot.docs.map(d => deleteDoc(doc(db, DB_COLLECTION, d.id)));
-        await Promise.all(deletePromises);
+        const snapshot = await adminDb.collection(DB_COLLECTION).get();
+        const batch = adminDb.batch();
+        snapshot.docs.forEach(doc => batch.delete(doc.ref));
+        await batch.commit();
     } catch (e) {
-        console.error("Firestore Clear Error:", e);
+        console.error("Firestore Admin Clear Error:", e);
     }
 };
