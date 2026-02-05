@@ -154,9 +154,9 @@ export async function GET(req: Request) {
 
                     let rawSlots: string[] = [];
                     const lines = normalizedText.split('\n');
-                    const keywords = ['slot', 'booking date', 'match date', 'start time', 'booking time', 'venue', 'purchase', 'event date', 'match time', 'transaction', 'invoice', 'date of play', 'booking details', 'booked for', 'slot details'];
+                    const keywords = ['slot', 'booking date', 'match date', 'start time', 'booking time', 'venue', 'purchase', 'event date', 'match time', 'transaction', 'invoice', 'date of play', 'booking details', 'booked for', 'slot details', 'match details'];
                     const datePattern = /(\d{1,2}\s+\w{3},\s*\d{4})|(\w{3},?\s+\d{1,2},?\s*\d{4})|(\d{1,2}[-/]\d{1,2}[-/]\d{2,4})|(?:Tomorrow|Today)|(\w{4,9},?\s+\d{1,2} \w{3})|(\d{1,2}\s+\w{3}\s+'\d{2})/i;
-                    const timePattern = /(\d{1,2}:\d{2}\s*(?:AM|PM))/i;
+                    const timePattern = /(\d{1,2}:\d{2}\s*(?:AM|PM)(?:\s*-\s*\d{1,2}:\d{2}\s*(?:AM|PM))?)/i;
 
                     for (const kw of keywords) {
                         const idx = lines.findIndex(l => l.toLowerCase().includes(kw));
