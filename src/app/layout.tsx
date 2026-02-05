@@ -47,8 +47,12 @@ export default function RootLayout({
                                 window.addEventListener('load', function() {
                                     navigator.serviceWorker.register('/sw.js').then(function(registration) {
                                         console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                                    }, function(err) {
+                                    }).catch(function(err) {
                                         console.log('ServiceWorker registration failed: ', err);
+                                        // Auto-Repair: If registration fails, unregister all and reload
+                                        navigator.serviceWorker.getRegistrations().then(regs => {
+                                            for(let reg of regs) reg.unregister();
+                                        });
                                     });
                                 });
                             }
