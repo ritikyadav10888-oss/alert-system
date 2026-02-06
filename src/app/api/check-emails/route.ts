@@ -301,11 +301,13 @@ export async function GET(req: Request) {
                     const normalizedText = cleanText.replace(/\r\n/g, '\n');
                     const fullText = (cand.subject + " " + normalizedText).toLowerCase();
 
-                    const locations = ['Matoshree', 'Matoshri', 'Baner', 'Model Coloney', 'Dahisar', 'Borivali', 'Andheri', 'Thane', 'Ghatkopar', 'Powai'];
+                    const locations = ['Matoshree', 'Matoshri', 'Baner', 'Model Colony', 'Dahisar', 'Borivali', 'Andheri', 'Thane West', 'Thane', 'Ghatkopar', 'Powai', 'Shivajinagar'];
                     let location = cand.platform === 'System' ? 'Security/Admin' : 'Unknown Location';
                     for (const loc of locations) {
                         if (fullText.includes(loc.toLowerCase())) {
-                            location = loc === 'Matoshri' ? 'Matoshree' : loc;
+                            if (loc === 'Matoshri') location = 'Matoshree';
+                            else if (loc === 'Thane West') location = 'Thane';
+                            else location = loc;
                             break;
                         }
                     }
