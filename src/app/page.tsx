@@ -20,7 +20,7 @@ interface AlertItem extends AlertProps {
 
 export default function Home() {
     const [alerts, setAlerts] = useState<AlertItem[]>([]);
-    const [selectedLocation, setSelectedLocation] = useState('Bangalore Arena');
+    const [selectedLocation, setSelectedLocation] = useState('All Locations');
     const [bookingHistory, setBookingHistory] = useState<AlertItem[]>([]);
     const [isHistoryLoaded, setIsHistoryLoaded] = useState(false);
     const [isTest, setIsTest] = useState(false);
@@ -67,7 +67,7 @@ export default function Home() {
     const locations = [
         'Thane',
         'Baner',
-        'Model Coloney',
+        'Model Colony',
         'Dahisar',
         'Borivali',
         'Andheri',
@@ -422,6 +422,59 @@ export default function Home() {
                                 🗑️ Clear
                             </button>
                         </div>
+                    </div>
+                </div>
+
+                <div className={styles.pushSection} style={{ marginBottom: '2rem', background: '#fff', padding: '20px', borderRadius: '16px', border: '1px solid #e2e8f0', boxShadow: '0 4px 6px -1px rgba(0,0,0,0.05)' }}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '10px', marginBottom: '15px' }}>
+                        <span style={{ fontSize: '1.5rem' }}>🔔</span>
+                        <h3 style={{ margin: 0, fontSize: '1.1rem', fontWeight: 800 }}>Mobile Push Alerts</h3>
+                    </div>
+                    <p style={{ fontSize: '0.85rem', color: '#64748b', marginBottom: '15px' }}>
+                        Get instant background notifications on your Android device for specific locations.
+                    </p>
+
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '12px', alignItems: 'center' }}>
+                        <select
+                            value={selectedLocation}
+                            onChange={(e) => setSelectedLocation(e.target.value)}
+                            style={{
+                                padding: '10px 15px',
+                                borderRadius: '12px',
+                                border: '2px solid #e2e8f0',
+                                fontSize: '0.9rem',
+                                background: '#f8fafc',
+                                outline: 'none',
+                                flex: 1,
+                                minWidth: '150px'
+                            }}
+                        >
+                            <option value="All Locations">All Locations</option>
+                            {locations.map(loc => (
+                                <option key={loc} value={loc}>{loc}</option>
+                            ))}
+                        </select>
+
+                        <button
+                            onClick={subscribeToPush}
+                            disabled={isPushSubmitting || pushStatus === 'enabled'}
+                            style={{
+                                padding: '10px 24px',
+                                borderRadius: '12px',
+                                background: pushStatus === 'enabled' ? '#22c55e' : '#2563eb',
+                                color: 'white',
+                                border: 'none',
+                                fontWeight: '700',
+                                cursor: isPushSubmitting ? 'not-allowed' : 'pointer',
+                                transition: 'all 0.2s',
+                                flex: 1,
+                                minWidth: '180px'
+                            }}
+                        >
+                            {isPushSubmitting ? '⏳ Subscribing...' :
+                                pushStatus === 'enabled' ? '✅ Notifications Enabled' :
+                                    '🔔 Enable Push Alerts'}
+                        </button>
                     </div>
                 </div>
 

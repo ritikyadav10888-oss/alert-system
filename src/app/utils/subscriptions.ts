@@ -1,5 +1,7 @@
 import Redis from 'ioredis';
 import { isDev } from './db-config';
+import fs from 'fs';
+import path from 'path';
 
 interface LocationSubscription {
     location: string;
@@ -8,7 +10,8 @@ interface LocationSubscription {
 }
 
 // Memory fallback for development
-let memorySubscriptions: LocationSubscription[] = [];
+const SUBS_FILE = path.join(process.cwd(), 'data', 'subscriptions_test.json');
+
 const REDIS_SUBS_KEY = isDev ? 'push_subscriptions_test' : 'push_subscriptions';
 
 // Singleton Redis Client matching db.ts logic
@@ -39,10 +42,16 @@ export const saveSubscription = async (location: string, subscription: any) => {
     };
 
     if (isDev) {
-        memorySubscriptions = memorySubscriptions.filter(s =>
+        const current = await getSubscriptions();
+        const filtered = current.filter(s =>
             JSON.stringify(s.subscription) !== JSON.stringify(subscription)
         );
-        memorySubscriptions.push(newSub);
+        filtered.push(newSub);
+
+        if (!fs.existsSync(path.dirname(SUBS_FILE))) {
+            fs.mkdirSync(path.dirname(SUBS_FILE), { recursive: true });
+        }
+        fs.writeFileSync(SUBS_FILE, JSON.stringify(filtered, null, 2));
     } else {
         try {
             const client = getRedisClient();
@@ -61,7 +70,15 @@ export const saveSubscription = async (location: string, subscription: any) => {
 
 export const getSubscriptions = async (): Promise<LocationSubscription[]> => {
     if (isDev) {
-        return memorySubscriptions;
+        if (fs.existsSync(SUBS_FILE)) {
+            try {
+                const data = fs.readFileSync(SUBS_FILE, 'utf-8');
+                return JSON.parse(data);
+            } catch (e) {
+                return [];
+            }
+        }
+        return [];
     } else {
         try {
             const client = getRedisClient();

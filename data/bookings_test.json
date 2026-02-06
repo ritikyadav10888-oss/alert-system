@@ -977,7 +977,7 @@
   {
     "id": "1634",
     "platform": "Playo",
-    "location": "Unknown Location",
+    "location": "Shivajinagar",
     "bookingSlot": "08:30 PM - 09:30 PM on 2026-01-08",
     "gameDate": "2026-01-08",
     "gameTime": "08:30 PM - 09:30 PM",
@@ -1133,7 +1133,7 @@
   {
     "id": "1964",
     "platform": "Playo",
-    "location": "Unknown Location",
+    "location": "Shivajinagar",
     "bookingSlot": "06:30 PM - 08:00 PM on 2026-02-03",
     "gameDate": "2026-02-03",
     "gameTime": "06:30 PM - 08:00 PM",
@@ -1237,7 +1237,7 @@
   {
     "id": "2018",
     "platform": "Playo",
-    "location": "Unknown Location",
+    "location": "Shivajinagar",
     "bookingSlot": "04:00 PM - 05:00 PM on 2026-02-03",
     "gameDate": "2026-02-03",
     "gameTime": "04:00 PM - 05:00 PM",
@@ -1311,5 +1311,18 @@
     "paidAmount": "₹470",
     "message": "Booking Confirmed!(NEW)",
     "timestamp": "2026-01-16T13:59:37.000Z"
+  },
+  {
+    "id": "2079",
+    "platform": "Hudle",
+    "location": "Thane",
+    "bookingSlot": "1. Sat, Feb 7, 2026 9:00 AM - Sat, Feb 7, 2026 9:30 AM | 2. Sat, Feb 7, 2026 9:30 AM - Sat, Feb 7, 2026 10:00 AM",
+    "gameDate": "Feb 7, 2026",
+    "gameTime": "9:00 AM | 9:30 AM | 10:00 AM",
+    "sport": "Badminton",
+    "bookingName": "N/A",
+    "paidAmount": "₹700",
+    "message": "Hudle - Booking #HUD2935661402",
+    "timestamp": "2026-02-06T07:19:50.000Z"
   }
 ]

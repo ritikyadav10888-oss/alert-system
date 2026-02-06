@@ -5,6 +5,7 @@ const withPWA = require("next-pwa")({
     skipWaiting: true,
     disable: false, // Enable PWA in all environments for device installation
     sw: "sw.js",
+    importScripts: ['/sw-push.js'], // 🔥 ADD PUSH LISTENER
     buildExcludes: [
         /middleware-manifest\.json$/,
         /app-build-manifest\.json$/,
