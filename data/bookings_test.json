@@ -1198,7 +1198,7 @@
   {
     "id": "1689",
     "platform": "Playo",
-    "location": "Unknown Location",
+    "location": "Shivajinagar",
     "bookingSlot": "03:00 PM - 04:00 PM on 2026-01-13",
     "gameDate": "2026-01-13",
     "gameTime": "03:00 PM - 04:00 PM",
@@ -1302,7 +1302,7 @@
   {
     "id": "1747",
     "platform": "Playo",
-    "location": "Unknown Location",
+    "location": "Shivajinagar",
     "bookingSlot": "07:00 AM - 09:00 AM on 2026-01-18",
     "gameDate": "2026-01-18",
     "gameTime": "07:00 AM - 09:00 AM",
@@ -1324,5 +1324,83 @@
     "paidAmount": "₹700",
     "message": "Hudle - Booking #HUD2935661402",
     "timestamp": "2026-02-06T07:19:50.000Z"
+  },
+  {
+    "id": "2080",
+    "platform": "Playo",
+    "location": "Baner",
+    "bookingSlot": "05:00 PM - 06:00 PM on 2026-02-06",
+    "gameDate": "2026-02-06",
+    "gameTime": "05:00 PM - 06:00 PM",
+    "sport": "Cricket",
+    "bookingName": "N/A",
+    "paidAmount": "₹474",
+    "message": "Booking Confirmed!(NEW)",
+    "timestamp": "2026-02-06T07:29:24.000Z"
+  },
+  {
+    "id": "2020",
+    "platform": "Playo",
+    "location": "Baner",
+    "bookingSlot": "06:30 PM - 08:30 PM on 2026-02-03",
+    "gameDate": "2026-02-03",
+    "gameTime": "06:30 PM - 08:30 PM",
+    "sport": "Cricket",
+    "bookingName": "N/A",
+    "paidAmount": "₹1,050",
+    "message": "Booking Confirmed!(NEW)",
+    "timestamp": "2026-02-03T08:40:38.000Z"
+  },
+  {
+    "id": "1966",
+    "platform": "Playo",
+    "location": "Baner",
+    "bookingSlot": "07:30 PM - 09:30 PM on 2026-02-04",
+    "gameDate": "2026-02-04",
+    "gameTime": "07:30 PM - 09:30 PM",
+    "sport": "Cricket",
+    "bookingName": "N/A",
+    "paidAmount": "₹2,362",
+    "message": "Booking Confirmed!(NEW)",
+    "timestamp": "2026-01-31T06:33:52.000Z"
+  },
+  {
+    "id": "1907",
+    "platform": "Hudle",
+    "location": "Borivali",
+    "bookingSlot": "1. Thu, Jan 29, 2026 10:00 PM - Thu, Jan 29, 2026 10:30 PM | 2. Thu, Jan 29, 2026 10:30 PM - Thu, Jan 29, 2026 11:00 PM",
+    "gameDate": "Jan 29, 2026",
+    "gameTime": "10:00 PM | 10:30 PM | 11:00 PM",
+    "sport": "Pickleball",
+    "bookingName": "N/A",
+    "paidAmount": "₹700",
+    "message": "Hudle - Booking #HUD3339633770",
+    "timestamp": "2026-01-28T15:45:30.000Z"
+  },
+  {
+    "id": "1857",
+    "platform": "Playo",
+    "location": "Baner",
+    "bookingSlot": "8:00 PM-9:30 PM on 24-01-2026",
+    "gameDate": "24-01-2026",
+    "gameTime": "8:00 PM - 9:30 PM",
+    "sport": "Football",
+    "bookingName": "N/A",
+    "paidAmount": "₹890",
+    "message": "[YPKWHZJD] Your Football booking is confirmed!",
+    "timestamp": "2026-01-24T09:36:39.000Z"
+  },
+  {
+    "id": "1802",
+    "platform": "Playo",
+    "location": "Baner",
+    "bookingSlot": "08:30 PM - 10:00 PM on 2026-01-22",
+    "gameDate": "2026-01-22",
+    "gameTime": "08:30 PM - 10:00 PM",
+    "sport": "Football",
+    "bookingName": "SUBHODEEP",
+    "paidAmount": "₹1,582",
+    "message": "Booking Confirmed!(NEW)",
+    "timestamp": "2026-01-20T09:15:32.000Z"
   }
 ]
