@@ -293,7 +293,7 @@
     "gameDate": "Jan 24, 2026",
     "gameTime": "10:00 AM - 12:00 PM",
     "sport": "Pickleball",
-    "bookingName": "N/A",
+    "bookingName": "Pankaj Karde",
     "paidAmount": "₹1,200",
     "message": "Hudle - Booking #HUD2337305044",
     "timestamp": "2026-01-22T12:38:36.000Z"
@@ -527,7 +527,7 @@
     "gameDate": "Jan 22, 2026",
     "gameTime": "7:00 PM - 8:00 PM",
     "sport": "Pickleball",
-    "bookingName": "N/A",
+    "bookingName": "Jahaan Shah",
     "paidAmount": "₹700",
     "message": "Hudle - Booking #HUD3563100683",
     "timestamp": "2026-01-22T10:28:26.000Z"
@@ -2923,5 +2923,83 @@
     "paidAmount": "₹2,800",
     "message": "Booking Confirmed!(NEW)",
     "timestamp": "2026-01-23T04:02:41.000Z"
+  },
+  {
+    "id": "2000",
+    "platform": "District",
+    "location": "Thane",
+    "bookingSlot": "MISSING",
+    "gameDate": "",
+    "gameTime": "",
+    "sport": "Badminton",
+    "bookingName": "Manali Kulkarni",
+    "paidAmount": "₹600",
+    "message": "You have a new purchase!",
+    "timestamp": "2026-02-01T12:56:59.000Z"
+  },
+  {
+    "id": "1920",
+    "platform": "Hudle",
+    "location": "Matoshree",
+    "bookingSlot": "1. Fri, Jan 30, 2026 8:30 PM - Fri, Jan 30, 2026 9:00 PM | 2. Fri, Jan 30, 2026 9:00 PM - Fri, Jan 30, 2026 9:30 PM | 3. Fri, Jan 30, 2026 9:30 PM - Fri, Jan 30, 2026 10:00 PM",
+    "gameDate": "Jan 30, 2026",
+    "gameTime": "8:30 PM - 10:00 PM",
+    "sport": "Pickleball",
+    "bookingName": "Gleeson Dlima",
+    "paidAmount": "₹900",
+    "message": "Hudle - Booking #HUD2355773139",
+    "timestamp": "2026-01-29T07:27:01.000Z"
+  },
+  {
+    "id": "1660",
+    "platform": "Playo",
+    "location": "Baner",
+    "bookingSlot": "03:00 PM - 05:00 PM on 2026-01-14",
+    "gameDate": "2026-01-14",
+    "gameTime": "03:00 PM - 05:00 PM",
+    "sport": "Football",
+    "bookingName": "SUBHODEEP",
+    "paidAmount": "₹1,040",
+    "message": "Booking Confirmed!(NEW)",
+    "timestamp": "2026-01-11T05:09:48.000Z"
+  },
+  {
+    "id": "1919",
+    "platform": "District",
+    "location": "Borivali",
+    "bookingSlot": "MISSING",
+    "gameDate": "",
+    "gameTime": "",
+    "sport": "Badminton",
+    "bookingName": "Saakshi zaveri",
+    "paidAmount": "₹600",
+    "message": "You have a new purchase!",
+    "timestamp": "2026-01-29T07:25:41.000Z"
+  },
+  {
+    "id": "1833",
+    "platform": "Playo",
+    "location": "Baner",
+    "bookingSlot": "7v7 Turf-5 @6:00 PM-8:00 PM on 23-01-2026",
+    "gameDate": "23-01-2026",
+    "gameTime": "6:00 PM - 8:00 PM",
+    "sport": "Cricket",
+    "bookingName": "SHIRISH",
+    "paidAmount": "₹1,088",
+    "message": "[OTDTRFUE] Your Box Cricket booking is rescheduled!",
+    "timestamp": "2026-01-22T11:28:33.000Z"
+  },
+  {
+    "id": "1829",
+    "platform": "Hudle",
+    "location": "Borivali",
+    "bookingSlot": "1. Thu, Jan 22, 2026 10:00 PM - Thu, Jan 22, 2026 10:30 PM | 2. Thu, Jan 22, 2026 10:30 PM - Thu, Jan 22, 2026 11:00 PM",
+    "gameDate": "Jan 22, 2026",
+    "gameTime": "10:00 PM - 11:00 PM",
+    "sport": "Pickleball",
+    "bookingName": "N/A",
+    "paidAmount": "₹700",
+    "message": "Hudle - Booking #HUD2274626742",
+    "timestamp": "2026-01-22T08:52:01.000Z"
   }
 ]
