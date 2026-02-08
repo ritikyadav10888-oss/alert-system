@@ -376,6 +376,12 @@ export async function syncEmails(depth: string = 'standard') {
                 console.log(`[Sync_Skip] Filtered (Review/Feedback): ${uid}`);
                 continue;
             }
+            // ❌ CANCELLATION FILTER
+            if (headerText.includes('cancelled') || headerText.includes('cancellation') || headerText.includes('refund')) {
+                console.log(`[Sync_Skip] Filtered (Cancellation/Refund): ${uid} | ${subject}`);
+                continue;
+            }
+
             if (junkKeywords.some(kw => headerText.includes(kw))) {
                 console.log(`[Sync_Skip] Filtered (Junk/Admin): ${uid} | ${subject}`);
                 continue;
