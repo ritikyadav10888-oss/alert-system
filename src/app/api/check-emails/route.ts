@@ -43,7 +43,7 @@ function extractDateOnly(slot: string): string {
     if (districtMatch) return districtMatch[1];
 
     // Look for formats: 2026-02-06, Feb 4, 31-01-2026, 06 Feb '26 etc.
-    const dateMatch = slot.match(/(\d{4}-\d{2}-\d{2})|(\d{1,2}-\d{1,2}-\d{4})|(\d{1,2}\s+\w{3},\s*\d{4})|(\w{3},?\s+\d{1,2},?\s*\d{4})|(\d{1,2}\s+\w{3}\s+'\d{2})/i);
+    const dateMatch = slot.match(/(\d{4}-\d{2}-\d{2})|(\d{1,2}-\d{1,2}-\d{4})|(\d{1,2}\s+\w{3},?\s*\d{4})|(\w{3},?\s+\d{1,2},?\s*\d{4})|(\d{1,2}\s+\w{3}\s+'\d{2})|(\w{3}\s+\d{1,2})/i);
     return dateMatch ? dateMatch[0] : "";
 }
 
@@ -51,24 +51,34 @@ function extractDateOnly(slot: string): string {
  * MERGES back-to-back time slots into a single duration (e.g., 7:30-8:30)
  */
 function extractTimeOnly(slot: string): string {
-    // First check for District format: "Date February 04 | 8:00pm"
+    // 1. First check for District format: "Date February 04 | 8:00pm"
     const districtTimeMatch = slot.match(/\|\s*(\d{1,2}:\d{2}\s*(?:am|pm))/i);
     if (districtTimeMatch) return districtTimeMatch[1];
 
-    const timeMatches = slot.match(/(\d{1,2}:\d{2}\s*(?:AM|PM)(?:\s*-\s*\d{1,2}:\d{2}\s*(?:AM|PM))?)/gi);
-    if (!timeMatches) return "";
-
-    // Normalize to range objects
-    const ranges = Array.from(new Set(timeMatches)).map(t => {
-        const parts = t.split('-').map(p => p.trim());
-        const start = parts[0];
-        const end = parts[1] || parts[0];
+    // 2. Extract ranges directly if possible (handling cases with text in between like Hudle)
+    const rangeRegex = /(\d{1,2}:\d{2}\s*(?:AM|PM))\s*(?:-.*?|to)\s*(\d{1,2}:\d{2}\s*(?:AM|PM))/gi;
+    const ranges: { start: string, end: string, startT: number, endT: number }[] = [];
+    let match;
+    while ((match = rangeRegex.exec(slot)) !== null) {
+        const start = match[1];
+        const end = match[2];
         const startT = new Date(`2000/01/01 ${start}`).getTime();
         const endT = new Date(`2000/01/01 ${end}`).getTime();
-        return { start, end, startT, endT };
-    });
+        ranges.push({ start, end, startT, endT });
+    }
 
-    // Sort by start transition
+    // 3. Fallback to individual matches and merge them if no ranges found or to augment ranges
+    const timeMatches = slot.match(/(\d{1,2}:\d{2}\s*(?:AM|PM))/gi);
+    if (timeMatches && ranges.length === 0) {
+        timeMatches.forEach(t => {
+            const tT = new Date(`2000/01/01 ${t}`).getTime();
+            ranges.push({ start: t, end: t, startT: tT, endT: tT });
+        });
+    }
+
+    if (ranges.length === 0) return "";
+
+    // Sort by start time
     ranges.sort((a, b) => a.startT - b.startT);
 
     // Merge logic
@@ -79,12 +89,8 @@ function extractTimeOnly(slot: string): string {
             continue;
         }
         const last = merged[merged.length - 1];
-        // If this slot starts when the last one ends -> Merge!
-        if (r.startT === last.endT) {
-            last.end = r.end;
-            last.endT = r.endT;
-        } else if (r.startT < last.endT) {
-            // Overlapping
+        // If this slot starts when the last one ends (or before) -> Merge!
+        if (r.startT <= last.endT) {
             if (r.endT > last.endT) {
                 last.end = r.end;
                 last.endT = r.endT;
@@ -104,6 +110,8 @@ function extractBookingName(text: string): string {
     // 1. 🛡️ TOP PRIORITY: Stated Names (Highly reliable labels)
     const patterns = [
         /(?:^|\n|[\*\•])\s*(?:Buyer|Purchased by|Ordered by|User Name|Customer Name|Player Name|Booking Name|Name|Customer|Player|Booked by)\s*[\s:]+\s*([A-Za-z]+(?:\s+[A-Za-z]+)*)/i,
+        // Match line-start labels specifically with colons
+        /(?:^|\n)\s*(?:Buyer|User Name|Customer Name|Booking Name|Name|User|Booked by)\s*:\s*([^\n\r\|]+)/i,
         /(?:Buyer|User Name|Customer Name|Booking Name|Name|User|Booked by)\s*[\s:]+\s*([^\n\r\|]+)/i
     ];
 
@@ -121,14 +129,22 @@ function extractBookingName(text: string): string {
                 let name = match[1].trim();
 
                 // Clean up suffixes (Stop at common labels)
-                name = name.split(/(?:\s+|\||\n)(?:Mobile|Email|Phone|No|Contact|Sport|Venue|Address|Id|Date|Time|Slot|Status|Amount|Facility|Hi|Hello|Thank|Dear|By|Is|It|User ID|Buyer|Booking|Invoice|Payment|A booking|A completed|Details)/i)[0].trim();
+                const cleanupRegex = /(?:\s+|\||\n)(?:Mobile|Email|Phone|No|Contact|Sport|Venue|Address|Id|Date|Time|Slot|Status|Amount|Facility|Hi|Hello|Thank|Dear|By|Is|It|User ID|Buyer|Booking|Invoice|Payment|A booking|A completed|Details|Paid|Rs\.?|₹|INR)/i;
+                name = name.split(cleanupRegex)[0].trim();
                 name = name.replace(/^[\s\|\:\&\-\d\*\•]+|[\s\|\:\&\-\d\n\r]+$/g, "");
 
                 const lowerName = name.toLowerCase();
-                const isVenue = venueKeywords.some(kw => lowerName.includes(kw));
-                const isForbidden = ['thank', 'you', 'dear', 'team', 'booking', 'it', 'is', 'the', 'your', 'a new', 'a booking', 'a completed', 'details', 'agreement'].some(kw => lowerName === kw || lowerName.includes(kw));
+                const isVenue = venueKeywords.some(kw => lowerName.includes(kw.toLowerCase()));
+
+                // Use word boundaries for forbidden keywords to avoid false positives (e.g., "it" in "Smiti")
+                const forbiddenKeywords = ['thank', 'you', 'dear', 'team', 'booking', 'it', 'is', 'the', 'your', 'a new', 'a booking', 'a completed', 'details', 'agreement'];
+                const isForbidden = forbiddenKeywords.some(kw => {
+                    const regex = new RegExp(`\\b${kw}\\b`, 'i');
+                    return regex.test(lowerName);
+                });
 
                 if (name.length >= 2 && name.length < 40 && !isVenue && !isForbidden &&
+                    !/\d/.test(name) && // Names usually don't have numbers
                     !lowerName.includes('email') && !lowerName.includes('mobile')) {
                     return name;
                 }
@@ -140,8 +156,16 @@ function extractBookingName(text: string): string {
     const greetingMatch = text.match(/(?:Hi|Dear|Hello|Hey),?\s+([A-Za-z]+(?:\s+[A-Za-z]+){0,2})/i);
     if (greetingMatch && greetingMatch[1]) {
         const name = greetingMatch[1].trim();
-        const forbidden = ['A', 'The', 'Your', 'Booking', 'Team', 'Thank', 'You', 'Dear', 'It', 'Is', 'To', 'From', 'This', 'By', 'A Booking', 'A New', 'A Player', 'A Completed', 'Details'];
-        if (name.length >= 2 && name.length < 25 && !forbidden.some(f => name.toLowerCase().includes(f.toLowerCase()))) {
+        const lowerName = name.toLowerCase();
+
+        // Use word boundaries to avoid false positives (e.g., rejecting "Swapni" because it has 'a')
+        const forbidden = ['a', 'the', 'your', 'booking', 'team', 'thank', 'you', 'dear', 'it', 'is', 'to', 'from', 'this', 'by', 'playo', 'hudle', 'district', 'khelomore'];
+        const isForbidden = forbidden.some(kw => {
+            const regex = new RegExp(`\\b${kw}\\b`, 'i');
+            return regex.test(lowerName);
+        });
+
+        if (name.length >= 2 && name.length < 25 && !isForbidden) {
             return name;
         }
     }
@@ -177,6 +201,72 @@ function extractPaidAmount(text: string): string {
         }
     }
     return "N/A";
+}
+
+/**
+ * Calls Gemini AI to extract structured data from email text as a fallback
+ */
+async function callGeminiAI(text: string) {
+    const apiKey = process.env.GEMINI_API_KEY;
+    if (!apiKey) return null;
+
+    // Use gemini-2.0-flash as it's the latest and most efficient for extraction
+    const model = "gemini-2.0-flash";
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
+
+    const prompt = `
+    Extract booking details from this email confirmation and return ONLY a raw JSON object.
+    IMPORTANT:
+    1. For "bookingName", extract the FULL NAME of the person who made the booking. 
+       Ignore generic labels like "User", "Buyer", "Purchased by", "Customer", "Sport", "Staff", "Manager", "System". 
+       If no real human name is found, return "N/A".
+    2. For "gameDate", use format "D MMM YYYY" (e.g. 12 Feb 2026). If the year is missing or seems to be 2001, assume 2026.
+    3. For "gameTime", provide the full time range (e.g. 06:00 PM - 07:00 PM).
+    4. Ensure the response is valid JSON.
+
+    {
+      "gameDate": "standardized date",
+      "gameTime": "standardized time range",
+      "location": "venue name",
+      "sport": "name of sport",
+      "bookingName": "full name of customer",
+      "paidAmount": "amount with currency symbol"
+    }
+
+    Email Body:
+    ${text.substring(0, 4000)}
+    `;
+
+    try {
+        const response = await fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                contents: [{ parts: [{ text: prompt }] }]
+            })
+        });
+
+        if (!response.ok) return null;
+
+        const result = await response.json();
+        const rawJson = result?.candidates?.[0]?.content?.parts?.[0]?.text || "";
+
+        // Clean markdown if present
+        const cleanJson = rawJson.replace(/```json/g, "").replace(/```/g, "").trim();
+        const parsed = JSON.parse(cleanJson);
+
+        // EXTRA VALIDATION: Discard common label hallucinations
+        const forbiddenNames = ['user', 'buyer', 'customer', 'staff', 'purchased', 'ordered', 'booking', 'booked', 'hi', 'dear', 'team', 'thank'];
+        if (parsed.bookingName && forbiddenNames.some(f => parsed.bookingName.toLowerCase() === f || parsed.bookingName.toLowerCase().includes(`${f} name`))) {
+            parsed.bookingName = 'N/A';
+        }
+
+        console.log(`[GeminiAI] Extracted: ${parsed.bookingName} | ${parsed.gameDate} | ${parsed.gameTime}`);
+        return parsed;
+    } catch (e) {
+        console.error("[GeminiAI] Extraction failed:", e);
+        return null;
+    }
 }
 
 export async function GET(req: Request) {
@@ -234,15 +324,19 @@ export async function GET(req: Request) {
 
         const existingHistory = await getBookings();
         const existingUids = new Set(existingHistory.map((h: any) => h.id.toString()));
-        const staleUids = new Set(existingHistory.filter((h: any) =>
-            h.bookingSlot === 'MISSING' ||
-            h.gameDate === 'TBD' ||
-            h.gameDate === 'MISSING' ||
-            h.location === 'Unknown Location' ||
-            !h.bookingName || h.bookingName === 'N/A' ||
-            !h.paidAmount || h.paidAmount === 'N/A' ||
-            !h.gameDate
-        ).map((h: any) => h.id.toString()));
+        const staleUids = new Set(existingHistory.filter((h: any) => {
+            const lowName = (h.bookingName || "").toLowerCase().trim();
+            const hasGarbageName = lowName === "" || lowName === "n/a" || lowName === "user" || lowName === "buyer" || lowName === "customer" || lowName === "staff";
+
+            return h.bookingSlot === 'MISSING' ||
+                h.gameDate === 'TBD' ||
+                h.gameDate === 'MISSING' ||
+                h.location === 'Unknown Location' ||
+                hasGarbageName ||
+                !h.paidAmount || h.paidAmount === 'N/A' ||
+                !h.gameDate ||
+                (h.gameDate && h.gameDate.includes('2001'));
+        }).map((h: any) => h.id.toString()));
 
         console.log(`[Sync] Found ${messages.length} messages. New/Stale: ${recentMessages.length}`);
 
@@ -259,8 +353,18 @@ export async function GET(req: Request) {
             console.log(`[Sync_Debug] Processing UID: ${uid} | Subject: ${subject}`);
 
             const reviewKeywords = ['review', 'rate your', 'feedback', 'how was', 'share your experience'];
+            const junkKeywords = [
+                'now live on district', 'download requested file', 'settlement report',
+                'payment report', 'payee advice', 'friend suggestion', 'security alert',
+                'payout report', 'reprots', 'summary report'
+            ];
+
             if (reviewKeywords.some(kw => headerText.includes(kw))) {
                 console.log(`[Sync_Skip] Filtered (Review/Feedback): ${uid}`);
+                continue;
+            }
+            if (junkKeywords.some(kw => headerText.includes(kw))) {
+                console.log(`[Sync_Skip] Filtered (Junk/Admin): ${uid} | ${subject}`);
                 continue;
             }
 
@@ -301,15 +405,33 @@ export async function GET(req: Request) {
                     const normalizedText = cleanText.replace(/\r\n/g, '\n');
                     const fullText = (cand.subject + " " + normalizedText).toLowerCase();
 
-                    const locations = ['Matoshree', 'Matoshri', 'Baner', 'Model Colony', 'Dahisar', 'Borivali', 'Andheri', 'Thane West', 'Thane', 'Ghatkopar', 'Powai', 'Shivajinagar'];
+                    const locations = ['Matoshree', 'Matoshri', 'Baner', 'Model Colony', 'Dahisar East', 'Dahisar', 'Borivali', 'Andheri', 'Thane West', 'Thane', 'Ghatkopar', 'Powai', 'Shivajinagar'];
                     let location = cand.platform === 'System' ? 'Security/Admin' : 'Unknown Location';
                     for (const loc of locations) {
                         if (fullText.includes(loc.toLowerCase())) {
                             if (loc === 'Matoshri') location = 'Matoshree';
                             else if (loc === 'Thane West') location = 'Thane';
+                            else if (loc === 'Dahisar East') location = 'Dahisar';
                             else location = loc;
                             break;
                         }
+                    }
+
+                    // 🥎 SMART SPORT DETECTION: Enhanced keyword mapping
+                    const sports = ['Badminton', 'Cricket', 'Pickleball', 'Football', 'Tennis', 'Squash'];
+                    let sport = 'General';
+                    for (const s of sports) {
+                        if (fullText.includes(s.toLowerCase())) {
+                            sport = s;
+                            break;
+                        }
+                    }
+
+                    // Venue-based sport inference
+                    if (sport === 'General') {
+                        if (fullText.includes('box cricket') || fullText.includes('turf cricket')) sport = 'Cricket';
+                        else if (fullText.includes('court') && !fullText.includes('pickleball')) sport = 'Badminton';
+                        else if (fullText.includes('pickleball')) sport = 'Pickleball';
                     }
 
                     let rawSlots: string[] = [];
@@ -408,15 +530,36 @@ export async function GET(req: Request) {
                         if (dMatch) gameDate = dMatch[0];
                     }
 
-                    const gameTime = extractTimeOnly(bookingSlot);
+                    let gameTime = extractTimeOnly(bookingSlot);
+                    let bookingName = extractBookingName(normalizedText);
+                    let paidAmount = extractPaidAmount(normalizedText);
 
-                    const bookingName = extractBookingName(normalizedText);
-                    const paidAmount = extractPaidAmount(normalizedText);
+                    // 🤖 AI FALLBACK: If regex failed or returned garbage (User/Buyer/N/A), try AI
+                    const isGarbageName = !bookingName || ['n/a', 'user', 'buyer', 'customer', 'staff', 'organizer'].includes(bookingName.toLowerCase().trim());
+                    const isMissingCritical = !gameDate || gameDate === 'MISSING' || gameDate === 'TBD' || gameDate.includes('2001');
+                    const isMissingSecondary = !sport || sport === 'General' || paidAmount === 'N/A';
 
-                    let sport = '';
-                    const sports = ['Badminton', 'Cricket', 'Pickleball', 'Football', 'Tennis', 'Squash'];
-                    for (const s of sports) {
-                        if (fullText.includes(s.toLowerCase())) { sport = s; break; }
+                    if (isGarbageName || isMissingCritical || isMissingSecondary) {
+                        console.log(`[Sync_AI] Attempting AI recovery for UID: ${uid} (Name: ${bookingName}, Sport: ${sport})...`);
+                        const aiData = await callGeminiAI(normalizedText);
+                        if (aiData) {
+                            // Only update if current is garbage and AI provides a meaningful name
+                            if (isGarbageName && aiData.bookingName && aiData.bookingName !== 'N/A') {
+                                bookingName = aiData.bookingName;
+                                console.log(`[Sync_AI] Recovered Name: ${bookingName}`);
+                            }
+                            // Only update if AI provides a better date than "MISSING", "TBD" or "2001"
+                            if ((!gameDate || gameDate === 'MISSING' || gameDate === 'TBD' || gameDate.includes('2001')) && aiData.gameDate && aiData.gameDate !== 'MISSING') {
+                                gameDate = aiData.gameDate;
+                                console.log(`[Sync_AI] Recovered Date: ${gameDate}`);
+                            }
+                            if ((!gameTime || gameTime === 'MISSING' || gameTime === 'TBD') && aiData.gameTime && aiData.gameTime !== 'MISSING') {
+                                gameTime = aiData.gameTime;
+                                console.log(`[Sync_AI] Recovered Time: ${gameTime}`);
+                            }
+                            if ((!sport || sport === 'General' || sport === '') && aiData.sport) sport = aiData.sport;
+                            if (paidAmount === 'N/A' && aiData.paidAmount && aiData.paidAmount !== 'N/A') paidAmount = aiData.paidAmount;
+                        }
                     }
 
                     if (bookingSlot !== 'MISSING' || bookingName !== 'N/A') {
@@ -451,12 +594,16 @@ export async function GET(req: Request) {
             // 📢 SEND PUSH NOTIFICATIONS FOR NEW ALERTS
             for (const alert of alerts) {
                 const isNew = !existingHistory.some((h: any) => h.id === alert.id);
-                if (isNew) {
+                const isGarbage = !alert.bookingName || ['n/a', 'user', 'buyer', 'customer', 'staff', 'organizer'].includes(alert.bookingName.toLowerCase().trim());
+
+                if (isNew && !isGarbage) {
                     await sendPushNotification(alert.location, {
                         title: `🏆 New ${alert.sport || 'Booking'}!`,
-                        body: `${alert.platform}: ${alert.gameTime} at ${alert.location}`,
+                        body: `${alert.platform}: ${alert.gameTime} at ${alert.location}\nName: ${alert.bookingName}`,
                         url: '/'
                     }).catch(err => console.error('Push error in loop:', err));
+                } else if (isNew && isGarbage) {
+                    console.log(`[Push_Skip] Skipping notification for garbage name: ${alert.bookingName} (UID: ${alert.id})`);
                 }
             }
         }

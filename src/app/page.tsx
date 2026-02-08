@@ -150,9 +150,16 @@ export default function Home() {
         if (!dateStr || dateStr === 'TBD' || dateStr === '-' || dateStr === 'MISSING') return "TBD";
         try {
             // Special handling for Khelomore '26 format
-            const cleanStr = dateStr.replace(/'(\d{2})/, '20$1');
+            let cleanStr = dateStr.replace(/'(\d{2})/, '20$1');
+
+            // DISTRICT FIX: If date is "February 08" and we miss the year, or it's "2001", force current year range
             const date = new Date(cleanStr);
             if (!isNaN(date.getTime())) {
+                const year = date.getFullYear();
+                if (year < 2025) {
+                    // Force 2026 for now as it's the current active year for these bookings
+                    date.setFullYear(2026);
+                }
                 return date.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
             }
         } catch (e) { }

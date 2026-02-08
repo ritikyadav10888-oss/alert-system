@@ -33,10 +33,10 @@ export const sendPushNotification = async (location: string, payload: { title: s
     // getSubscriptions already handles checking Vercel KV or local memory
     const subscriptions = await getSubscriptions();
 
-    // Filter by location (Targeted) or include all if location is generic (Broadcast)
+    // Filter by location (Targeted) or include those opted for "All Locations"
     const targetSubs = subscriptions.filter(sub => {
         if (!location || location === 'Unknown' || location === 'General') return true;
-        return sub.location === location;
+        return sub.location === location || sub.location === 'All Locations';
     });
 
     console.log(`[Push] Sending to ${targetSubs.length} devices for location: ${location || 'Broadcast'}`);
