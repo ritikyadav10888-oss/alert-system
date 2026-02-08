@@ -2598,5 +2598,18 @@
     "paidAmount": "₹1,330",
     "message": "Booking Confirmed!(NEW)",
     "timestamp": "2026-01-16T12:18:14.000Z"
+  },
+  {
+    "id": "1743",
+    "platform": "Playo",
+    "location": "Baner",
+    "bookingSlot": "05:30 PM - 07:30 PM on 2026-01-16",
+    "gameDate": "2026-01-16",
+    "gameTime": "05:30 PM - 07:30 PM",
+    "sport": "Cricket",
+    "bookingName": "AMIT",
+    "paidAmount": "₹2,400",
+    "message": "Booking Confirmed!(NEW)",
+    "timestamp": "2026-01-16T11:49:31.000Z"
   }
 ]
