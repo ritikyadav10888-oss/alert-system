@@ -432,6 +432,7 @@ export async function GET(req: Request) {
                         if (fullText.includes('box cricket') || fullText.includes('turf cricket')) sport = 'Cricket';
                         else if (fullText.includes('court') && !fullText.includes('pickleball')) sport = 'Badminton';
                         else if (fullText.includes('pickleball')) sport = 'Pickleball';
+                        else if (cand.platform === 'Khelomore' && location === 'Matoshree') sport = 'Pickleball';
                     }
 
                     let rawSlots: string[] = [];
