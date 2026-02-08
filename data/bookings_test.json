@@ -2520,5 +2520,83 @@
     "paidAmount": "₹1,096",
     "message": "You have a new booking from KheloMore: 2026-116-IQSW",
     "timestamp": "2026-01-16T15:56:01.000Z"
+  },
+  {
+    "id": "1752",
+    "platform": "Khelomore",
+    "location": "Matoshree",
+    "bookingSlot": "17 Jan '26, 00:00 PM - 00:30 PM | 17 Jan '26, 00:30 PM - 01:00 PM",
+    "gameDate": "17 Jan '26",
+    "gameTime": "00:00 PM - 01:00 PM",
+    "sport": "Badminton",
+    "bookingName": "Kunjal",
+    "paidAmount": "₹1,096",
+    "message": "You have a new booking from KheloMore: 2026-116-IQSW",
+    "timestamp": "2026-01-16T15:55:57.000Z"
+  },
+  {
+    "id": "1750",
+    "platform": "Playo",
+    "location": "Baner",
+    "bookingSlot": "7:00 AM-8:00 AM on 18-01-2026",
+    "gameDate": "18-01-2026",
+    "gameTime": "7:00 AM - 8:00 AM",
+    "sport": "Pickleball",
+    "bookingName": "Sagar",
+    "paidAmount": "₹600",
+    "message": "[VCXJGBLE] Your Pickleball booking is confirmed!",
+    "timestamp": "2026-01-16T15:29:45.000Z"
+  },
+  {
+    "id": "1749",
+    "platform": "Hudle",
+    "location": "Borivali",
+    "bookingSlot": "1. Sat, Jan 17, 2026 7:00 AM - Sat, Jan 17, 2026 7:30 AM | 2. Sat, Jan 17, 2026 7:30 AM - Sat, Jan 17, 2026 8:00 AM",
+    "gameDate": "Jan 17, 2026",
+    "gameTime": "7:00 AM - 8:00 AM",
+    "sport": "Pickleball",
+    "bookingName": "Hrishikesh Gandhi",
+    "paidAmount": "₹700",
+    "message": "Hudle - Booking #HUD3535635503",
+    "timestamp": "2026-01-16T15:23:25.000Z"
+  },
+  {
+    "id": "1747",
+    "platform": "Playo",
+    "location": "Shivajinagar",
+    "bookingSlot": "07:00 AM - 09:00 AM on 2026-01-18",
+    "gameDate": "2026-01-18",
+    "gameTime": "07:00 AM - 09:00 AM",
+    "sport": "Cricket",
+    "bookingName": "ABHISHEK",
+    "paidAmount": "₹470",
+    "message": "Booking Confirmed!(NEW)",
+    "timestamp": "2026-01-16T13:59:37.000Z"
+  },
+  {
+    "id": "1746",
+    "platform": "Khelomore",
+    "location": "Matoshree",
+    "bookingSlot": "17 Jan '26, 08:00 PM - 08:30 PM | 17 Jan '26, 08:30 PM - 09:00 PM",
+    "gameDate": "17 Jan '26",
+    "gameTime": "08:00 PM - 09:00 PM",
+    "sport": "Badminton",
+    "bookingName": "Suraj Gaur",
+    "paidAmount": "₹515",
+    "message": "You have a new booking from KheloMore: 2026-116-HWEL",
+    "timestamp": "2026-01-16T13:11:31.000Z"
+  },
+  {
+    "id": "1744",
+    "platform": "Playo",
+    "location": "Baner",
+    "bookingSlot": "07:30 PM - 08:30 PM on 2026-01-16",
+    "gameDate": "2026-01-16",
+    "gameTime": "07:30 PM - 08:30 PM",
+    "sport": "Cricket",
+    "bookingName": "DIVYANSH",
+    "paidAmount": "₹1,330",
+    "message": "Booking Confirmed!(NEW)",
+    "timestamp": "2026-01-16T12:18:14.000Z"
   }
 ]
