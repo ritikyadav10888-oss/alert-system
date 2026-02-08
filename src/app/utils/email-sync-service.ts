@@ -103,6 +103,17 @@ function extractTimeOnly(slot: string): string {
  * Extracts customer/booking name from email text
  */
 function extractBookingName(text: string): string {
+    // 0. 🧹 KNOWN GARBAGE BLOCKLIST (Exact matches or startsWith)
+    const garbageBlocklist = [
+        'user email phone',
+        'force playing fields',
+        'force playing fields phone',
+        'user name email',
+        'customer name email',
+        'booking id',
+        'transaction id'
+    ];
+
     // 1. 🛡️ TOP PRIORITY: Stated Names (Highly reliable labels)
     const patterns = [
         // 1. New Robust Pattern: Handles bullets (-, *, •), underscores (__Name__), and variations
@@ -127,12 +138,14 @@ function extractBookingName(text: string): string {
                 let name = match[1].trim();
 
                 // Clean up suffixes (Stop at common labels)
-                const cleanupRegex = /(?:\s+|\||\n)(?:Mobile|Email|Phone|No|Contact|Sport|Venue|Address|Id|Date|Time|Slot|Status|Amount|Facility|Hi|Hello|Thank|Dear|By|Is|It|User ID|Buyer|Booking|Invoice|Payment|A booking|A completed|Details|Paid|Rs\.?|₹|INR)/i;
+                // MODIFIED: Changed regex to catch start-of-string matches too (e.g. "Email")
+                const cleanupRegex = /(?:^|[\s\|\n])(?:Mobile|Email|Phone|No|Contact|Sport|Venue|Address|Id|Date|Time|Slot|Status|Amount|Facility|Hi|Hello|Thank|Dear|By|Is|It|User ID|Buyer|Booking|Invoice|Payment|A booking|A completed|Details|Paid|Rs\.?|₹|INR)/i;
                 name = name.split(cleanupRegex)[0].trim();
                 name = name.replace(/^[\s\|\:\&\-\d\*\•]+|[\s\|\:\&\-\d\n\r]+$/g, "");
 
                 const lowerName = name.toLowerCase();
                 const isVenue = venueKeywords.some(kw => lowerName.includes(kw.toLowerCase()));
+                const isGarbage = garbageBlocklist.some(g => lowerName.includes(g));
 
                 // Use word boundaries for forbidden keywords to avoid false positives (e.g., "it" in "Smiti")
                 const forbiddenKeywords = ['thank', 'you', 'dear', 'team', 'booking', 'it', 'is', 'the', 'your', 'a new', 'a booking', 'a completed', 'details', 'agreement'];
@@ -141,7 +154,7 @@ function extractBookingName(text: string): string {
                     return regex.test(lowerName);
                 });
 
-                if (name.length >= 2 && name.length < 40 && !isVenue && !isForbidden &&
+                if (name.length >= 2 && name.length < 40 && !isVenue && !isForbidden && !isGarbage &&
                     !/\d/.test(name) && // Names usually don't have numbers
                     !lowerName.includes('email') && !lowerName.includes('mobile')) {
                     return name;
@@ -163,7 +176,11 @@ function extractBookingName(text: string): string {
             return regex.test(lowerName);
         });
 
-        if (name.length >= 2 && name.length < 25 && !isForbidden) {
+        // Add strict venue/garbage checks here too
+        const isVenue = venueKeywords.some(kw => lowerName.includes(kw.toLowerCase()));
+        const isGarbage = garbageBlocklist.some(g => lowerName.includes(g));
+
+        if (name.length >= 2 && name.length < 25 && !isForbidden && !isVenue && !isGarbage) {
             return name;
         }
     }
