@@ -3794,5 +3794,57 @@
     "paidAmount": "₹600",
     "message": "Hudle - Booking #HUD3567753806",
     "timestamp": "2025-10-23T05:10:26.000Z"
+  },
+  {
+    "id": "2176",
+    "platform": "Hudle",
+    "location": "Matoshree",
+    "bookingSlot": "1. Mon, Feb 9, 2026 8:00 PM - Mon, Feb 9, 2026 8:30 PM | 2. Mon, Feb 9, 2026 8:30 PM - Mon, Feb 9, 2026 9:00 PM | 3. Mon, Feb 9, 2026 9:00 PM - Mon, Feb 9, 2026 9:30 PM | 4. Mon, Feb 9, 2026 9:30 PM - Mon, Feb 9, 2026 10:00 PM",
+    "gameDate": "Feb 9, 2026",
+    "gameTime": "8:00 PM - 10:00 PM",
+    "sport": "Pickleball",
+    "bookingName": "Moiz Dohadwala",
+    "paidAmount": "₹1,200",
+    "message": "Hudle - Booking #HUD2300071681",
+    "timestamp": "2026-02-09T08:29:22.000Z"
+  },
+  {
+    "id": "2097",
+    "platform": "District",
+    "location": "Borivali",
+    "bookingSlot": "MISSING",
+    "gameDate": "",
+    "gameTime": "",
+    "sport": "Badminton",
+    "bookingName": "Subit Kapoor",
+    "paidAmount": "₹950",
+    "message": "You have a new purchase!",
+    "timestamp": "2026-02-06T11:31:13.000Z"
+  },
+  {
+    "id": "1990",
+    "platform": "Playo",
+    "location": "Shivajinagar",
+    "bookingSlot": "05:00 PM - 07:00 PM on 2026-02-07",
+    "gameDate": "2026-02-07",
+    "gameTime": "05:00 PM - 07:00 PM",
+    "sport": "Cricket",
+    "bookingName": "SWAPNI",
+    "paidAmount": "₹520",
+    "message": "Booking Confirmed!(NEW)",
+    "timestamp": "2026-01-31T16:47:05.000Z"
+  },
+  {
+    "id": "1892",
+    "platform": "Playo",
+    "location": "Baner",
+    "bookingSlot": "07:30 PM - 08:30 PM on 2026-01-27",
+    "gameDate": "2026-01-27",
+    "gameTime": "07:30 PM - 08:30 PM",
+    "sport": "Cricket",
+    "bookingName": "DEVASHISH",
+    "paidAmount": "₹1,045",
+    "message": "Booking Confirmed!(NEW)",
+    "timestamp": "2026-01-27T12:41:57.000Z"
   }
 ]
