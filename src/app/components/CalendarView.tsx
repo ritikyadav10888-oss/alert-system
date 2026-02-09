@@ -10,13 +10,13 @@ interface Booking {
     id: string;
     platform: string;
     location: string;
-    bookingSlot: string;
-    gameDate: string;
+    bookingSlot?: string;
+    gameDate?: string;
     gameTime: string;
-    sport: string;
-    bookingName: string;
-    paidAmount: string;
-    timestamp: string;
+    sport?: string;
+    bookingName?: string;
+    paidAmount?: string;
+    timestamp: Date | string;
 }
 
 interface CalendarViewProps {

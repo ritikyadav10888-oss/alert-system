@@ -300,7 +300,7 @@ export default function Home() {
                 <div className={styles.headerContainer}>
                     <h1 className={styles.title}>Turf Alert Dashboard</h1>
 
-                    <div className={styles.userBadgeContainer as string || ''} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                    <div className={styles.userBadgeContainer} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
                         <span style={{
                             padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 'bold',
                             background: isTest ? '#fef3c7' : '#dcfce7', color: isTest ? '#92400e' : '#166534',

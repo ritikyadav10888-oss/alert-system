@@ -4,7 +4,7 @@ import { User, Trophy, Star, History, Search, ArrowUpDown, ArrowUp, ArrowDown } 
 interface Booking {
     id: string;
     bookingName: string;
-    paidAmount: string; // e.g. "₹618" or "N/A"
+    paidAmount?: string; // e.g. "₹618" or "N/A"
     sport: string;
     timestamp: Date;
     platform: string;
@@ -60,7 +60,7 @@ const CustomerView: React.FC<CustomerViewProps> = ({ bookings }) => {
             profile.bookingCount += 1;
 
             // Clean amount string
-            const amountStr = b.paidAmount.replace(/[^\d.]/g, '');
+            const amountStr = (b.paidAmount || '0').replace(/[^\d.]/g, '');
             const amount = parseFloat(amountStr) || 0;
             profile.totalSpend += amount;
 

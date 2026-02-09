@@ -15,10 +15,10 @@ interface Booking {
     id: string;
     platform: string;
     location: string;
-    gameDate: string;
-    gameTime: string;
-    sport: string;
-    paidAmount: string;
+    gameDate?: string;
+    gameTime?: string;
+    sport?: string;
+    paidAmount?: string;
     timestamp: Date | string;
 }
 
@@ -31,6 +31,17 @@ const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#8884d8', '#82ca9d'
 export default function AnalyticsView({ data }: AnalyticsViewProps) {
     // 1. Process Data for Charts
     const stats = useMemo(() => {
+        if (!data || data.length === 0) {
+            return {
+                totalRevenue: 0,
+                todayRevenue: 0,
+                revenueData: [],
+                sportData: [],
+                locationData: [],
+                hourData: [],
+                bookingCount: 0
+            };
+        }
         const revenueByDate: Record<string, number> = {};
         const revenueBySport: Record<string, number> = {};
         const revenueByLocation: Record<string, number> = {};
@@ -100,6 +111,14 @@ export default function AnalyticsView({ data }: AnalyticsViewProps) {
             bookingCount: data.length
         };
     }, [data]);
+
+    if (!data || data.length === 0) {
+        return (
+            <div className={styles.analyticsContainer} style={{ textAlign: 'center', padding: '2rem', color: '#64748b' }}>
+                <p>No data available to display.</p>
+            </div>
+        );
+    }
 
     return (
         <div className={styles.analyticsContainer}>
