@@ -119,7 +119,7 @@ export default function AnalyticsView({ data }: AnalyticsViewProps) {
                         <TrendingUp color="#00C49F" size={24} />
                     </div>
                     <div className={styles.statInfo}>
-                        <span className={styles.statLabel}>Today's Revenue</span>
+                        <span className={styles.statLabel}>Today&apos;s Revenue</span>
                         <h2 className={styles.statValue}>₹{stats.todayRevenue.toLocaleString()}</h2>
                     </div>
                 </div>

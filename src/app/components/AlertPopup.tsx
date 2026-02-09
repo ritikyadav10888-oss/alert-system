@@ -34,6 +34,11 @@ const getPlatformStyle = (platform: string) => {
 const AlertPopup: React.FC<AlertProps> = ({ id, platform, message, location, timestamp, bookingSlot, sport, bookingName, paidAmount, onDismiss }) => {
     const [isVisible, setIsVisible] = useState(false);
 
+    const handleDismiss = React.useCallback(() => {
+        setIsVisible(false);
+        setTimeout(() => onDismiss(id), 300); // Wait for animation
+    }, [id, onDismiss]);
+
     useEffect(() => {
         setIsVisible(true);
         // Auto dismiss after 10 seconds
@@ -41,12 +46,7 @@ const AlertPopup: React.FC<AlertProps> = ({ id, platform, message, location, tim
             handleDismiss();
         }, 10000);
         return () => clearTimeout(timer);
-    }, []);
-
-    const handleDismiss = () => {
-        setIsVisible(false);
-        setTimeout(() => onDismiss(id), 300); // Wait for animation
-    };
+    }, [handleDismiss]);
 
     const formatTime = (date: Date) => {
         return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });

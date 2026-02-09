@@ -1,14 +1,16 @@
-"use client";
+﻿"use client";
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import AlertPopup, { AlertProps } from './components/AlertPopup';
 import AnalyticsView from './components/AnalyticsView';
 import CalendarView from './components/CalendarView';
+import CustomerView from './components/CustomerView';
+import FinancialView from './components/FinancialView';
 import RoleSelector from './components/RoleSelector';
 import { playAlertSound } from './utils/sound';
 import { playCashRegisterSound } from './utils/audio';
 import { getManagerForLocation } from './utils/managers';
-import { LayoutDashboard, BarChart3, Calendar as CalendarDays, Settings, ShieldCheck, UserCircle } from 'lucide-react';
+import { LayoutDashboard, BarChart3, Calendar as CalendarDays, Settings, ShieldCheck, UserCircle, IndianRupee } from 'lucide-react';
 import styles from './page.module.css';
 
 interface AlertItem extends AlertProps {
@@ -24,7 +26,7 @@ interface AlertItem extends AlertProps {
 }
 
 export default function Home() {
-    const [view, setView] = useState<'live' | 'analytics' | 'calendar'>('live');
+    const [view, setView] = useState<'live' | 'analytics' | 'calendar' | 'customers' | 'financials'>('live');
     const [alerts, setAlerts] = useState<AlertItem[]>([]);
     const [selectedLocation, setSelectedLocation] = useState('All Locations');
     const [bookingHistory, setBookingHistory] = useState<AlertItem[]>([]);
@@ -175,7 +177,7 @@ export default function Home() {
 
     const isSyncingRef = useRef(false);
 
-    const checkEmails = async (retries = 1, depth = '') => {
+    const checkEmails = useCallback(async (retries = 1, depth = '') => {
         if (!isLiveSync || isSyncingRef.current || !isHistoryLoaded || !isRoleSet) return;
         isSyncingRef.current = true;
         setSyncStatus(depth === 'all' ? 'Deep Scanning...' : 'Syncing...');
@@ -217,7 +219,7 @@ export default function Home() {
         } finally {
             isSyncingRef.current = false;
         }
-    };
+    }, [isLiveSync, isHistoryLoaded, isRoleSet, userRole, managerLocation, bookingHistory]);
 
     const handleDeepSync = () => {
         if (confirm("Scan entire inbox?")) checkEmails(1, 'all');
@@ -295,8 +297,19 @@ export default function Home() {
             {!isRoleSet && <RoleSelector onSelect={handleRoleSelect} locations={locations} />}
 
             <div className={styles.dashboard}>
-                <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '15px', marginBottom: '2rem', position: 'relative' }}>
-                    <div style={{ position: 'absolute', right: 0, top: 0, display: 'flex', alignItems: 'center', gap: '10px' }}>
+                <div className={styles.headerContainer}>
+                    <h1 className={styles.title}>Turf Alert Dashboard</h1>
+
+                    <div className={styles.userBadgeContainer as string || ''} style={{ display: 'flex', alignItems: 'center', gap: '10px' }}>
+                        <span style={{
+                            padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 'bold',
+                            background: isTest ? '#fef3c7' : '#dcfce7', color: isTest ? '#92400e' : '#166534',
+                            border: `1px solid ${isTest ? '#f59e0b' : '#22c55e'}`, textTransform: 'uppercase',
+                            whiteSpace: 'nowrap'
+                        }}>
+                            {isTest ? '🧪 Test Mode' : '🚀 Production'}
+                        </span>
+
                         <div style={{
                             background: userRole === 'owner' ? '#eff6ff' : '#ecfdf5',
                             padding: '6px 14px', borderRadius: '12px', border: `1px solid ${userRole === 'owner' ? '#3b82f6' : '#10b981'}`,
@@ -304,22 +317,13 @@ export default function Home() {
                         }}>
                             {userRole === 'owner' ? <ShieldCheck size={16} color="#3b82f6" /> : <UserCircle size={16} color="#10b981" />}
                             <span style={{ fontWeight: 800, fontSize: '0.75rem', color: userRole === 'owner' ? '#1e40af' : '#065f46' }}>
-                                {userRole === 'owner' ? 'OWNER' : `MANAGER: ${managerLocation}`}
+                                {userRole === 'owner' ? 'OWNER' : userRole ? 'MANAGER' : 'GUEST'}
                             </span>
                         </div>
                         <button onClick={handleResetRole} style={{ background: '#f8fafc', border: '1px solid #e2e8f0', borderRadius: '10px', padding: '6px' }}>
                             <Settings size={18} />
                         </button>
                     </div>
-
-                    <h1 className={styles.title} style={{ margin: 0 }}>Turf Alert Dashboard</h1>
-                    <span style={{
-                        padding: '4px 12px', borderRadius: '20px', fontSize: '0.75rem', fontWeight: 'bold',
-                        background: isTest ? '#fef3c7' : '#dcfce7', color: isTest ? '#92400e' : '#166534',
-                        border: `1px solid ${isTest ? '#f59e0b' : '#22c55e'}`, textTransform: 'uppercase'
-                    }}>
-                        {isTest ? '🧪 Test Mode' : '🚀 Production'}
-                    </span>
                 </div>
 
                 {/* 📊 TAB NAVIGATION */}
@@ -332,6 +336,12 @@ export default function Home() {
                     </button>
                     <button className={`${styles.tabBtn} ${view === 'calendar' ? styles.active : ''}`} onClick={() => setView('calendar')}>
                         <CalendarDays size={18} /> Calendar
+                    </button>
+                    <button className={`${styles.tabBtn} ${view === 'customers' ? styles.active : ''}`} onClick={() => setView('customers')}>
+                        <UserCircle size={18} /> Customers
+                    </button>
+                    <button className={`${styles.tabBtn} ${view === 'financials' ? styles.active : ''}`} onClick={() => setView('financials')}>
+                        <IndianRupee size={18} /> Financials
                     </button>
                 </div>
 
@@ -349,24 +359,116 @@ export default function Home() {
                             </div>
                         </div>
 
+                        {/* 📱 MOBILE VIEW: CARDS */}
+                        <div className={styles.cardContainer}>
+                            {sortedHistory.map((item: any) => (
+                                <div key={item.id} className={styles.card}>
+                                    <div className={styles.cardHeader}>
+                                        <div className={styles.platformBadge} style={{
+                                            background: item.platform === 'Playo' ? '#E8F5E9' :
+                                                item.platform === 'Hudle' ? '#E1F5FE' :
+                                                    item.platform === 'Khelomore' ? '#FBE9E7' :
+                                                        item.platform === 'System' ? '#F3E5F5' : '#ECEFF1',
+                                            color: item.platform === 'Playo' ? '#2E7D32' :
+                                                item.platform === 'Hudle' ? '#0277BD' :
+                                                    item.platform === 'Khelomore' ? '#D84315' :
+                                                        item.platform === 'System' ? '#6A1B9A' : '#37474F'
+                                        }}>
+                                            {item.platform}
+                                        </div>
+                                        <div className={styles.receivedTime}>
+                                            {item.timestamp.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                                            {Date.now() - item.timestamp.getTime() < 120000 && (
+                                                <span style={{
+                                                    fontSize: '0.65rem',
+                                                    background: '#4ade80',
+                                                    color: '#fff',
+                                                    padding: '1px 5px',
+                                                    borderRadius: '10px',
+                                                    animation: 'pulse 1.5s infinite',
+                                                    fontWeight: 'bold',
+                                                    marginLeft: '5px'
+                                                }}>NEW</span>
+                                            )}
+                                        </div>
+                                    </div>
+                                    <div className={styles.cardBody}>
+                                        <div className={styles.cardRow}>
+                                            <span className={styles.cardLabel}>Location:</span>
+                                            <span className={styles.cardValue}>{item.location}</span>
+                                        </div>
+                                        <div className={styles.cardRow}>
+                                            <span className={styles.cardLabel}>Sport:</span>
+                                            <span className={styles.cardValue}>{item.sport || 'General'}</span>
+                                        </div>
+                                        <div className={styles.cardRow}>
+                                            <span className={styles.cardLabel}>Date:</span>
+                                            <span className={styles.cardValue}>{formatGameDate(item.gameDate)}</span>
+                                        </div>
+                                        <div className={styles.cardRow}>
+                                            <span className={styles.cardLabel}>Time:</span>
+                                            <span className={styles.cardValue}>{item.gameTime || item.bookingSlot || '-'}</span>
+                                        </div>
+                                        <div className={styles.cardRow}>
+                                            <span className={styles.cardLabel}>Customer:</span>
+                                            <span className={styles.cardValue}>{item.bookingName || 'N/A'}</span>
+                                        </div>
+                                        <div className={styles.cardRow}>
+                                            <span className={styles.cardLabel}>Manager:</span>
+                                            <span className={styles.cardValue}>{getManagerForLocation(item.location).name}</span>
+                                        </div>
+                                        <div className={styles.cardBottomRow}>
+                                            <div style={{ fontSize: '0.75rem', color: '#cbd5e1' }}>
+                                                {item.timestamp.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}
+                                            </div>
+                                            <span style={{
+                                                fontSize: '1rem',
+                                                color: item.paidAmount !== 'N/A' ? '#15803d' : '#64748b',
+                                                background: item.paidAmount !== 'N/A' ? '#dcfce7' : '#f1f5f9',
+                                                padding: '4px 12px',
+                                                borderRadius: '8px',
+                                                fontWeight: '800'
+                                            }}>
+                                                {item.paidAmount || 'N/A'}
+                                            </span>
+                                        </div>
+                                        {item.message && (
+                                            <div style={{
+                                                marginTop: '8px',
+                                                paddingTop: '8px',
+                                                borderTop: '1px solid #f1f5f9',
+                                                fontSize: '0.75rem',
+                                                color: '#94a3b8',
+                                                fontStyle: 'italic'
+                                            }}>
+                                                {item.message}
+                                            </div>
+                                        )}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+
+                        {/* DESKTOP VIEW: TABLE */}
                         <div className={styles.tableContainer}>
-                            <table className={styles.bookingTable}>
-                                <thead style={{ background: '#f1f5f9', borderBottom: '2px solid #e2e8f0' }}>
+                            <table className={`${styles.bookingTable} ${styles.desktopOnly}`}>
+                                <thead style={{ background: '#f8fafc', borderBottom: '2px solid #e2e8f0', position: 'sticky', top: 0, zIndex: 10 }}>
                                     <tr>
-                                        <th style={{ padding: '15px 10px', textAlign: 'left' }}>Received</th>
-                                        <th style={{ padding: '15px 10px', textAlign: 'left' }}>Game Date</th>
-                                        <th style={{ padding: '15px 10px', textAlign: 'left' }}>Time</th>
-                                        <th style={{ padding: '15px 10px', textAlign: 'left' }}>Platform</th>
-                                        <th style={{ padding: '15px 10px', textAlign: 'left' }}>Sport</th>
-                                        <th style={{ padding: '15px 10px', textAlign: 'left' }}>Customer</th>
-                                        <th style={{ padding: '15px 10px', textAlign: 'left' }}>Amount</th>
-                                        <th style={{ padding: '15px 10px', textAlign: 'left' }}>Location</th>
-                                        <th style={{ padding: '15px 10px', textAlign: 'left' }}>Notified</th>
+                                        <th style={{ padding: '15px 10px', textAlign: 'left', color: '#64748b', fontSize: '0.85rem' }}>Received</th>
+                                        <th style={{ padding: '15px 10px', textAlign: 'left', color: '#64748b', fontSize: '0.85rem' }}>Game Date</th>
+                                        <th style={{ padding: '15px 10px', textAlign: 'left', color: '#64748b', fontSize: '0.85rem' }}>Time</th>
+                                        <th style={{ padding: '15px 10px', textAlign: 'left', color: '#64748b', fontSize: '0.85rem' }}>Platform</th>
+                                        <th style={{ padding: '15px 10px', textAlign: 'left', color: '#64748b', fontSize: '0.85rem' }}>Sport</th>
+                                        <th style={{ padding: '15px 10px', textAlign: 'left', color: '#64748b', fontSize: '0.85rem' }}>Customer</th>
+                                        <th style={{ padding: '15px 10px', textAlign: 'left', color: '#64748b', fontSize: '0.85rem' }}>Amount</th>
+                                        <th style={{ padding: '15px 10px', textAlign: 'left', color: '#64748b', fontSize: '0.85rem' }}>Location</th>
+                                        <th style={{ padding: '15px 10px', textAlign: 'left', color: '#64748b', fontSize: '0.85rem' }}>Details</th>
+                                        <th style={{ padding: '15px 10px', textAlign: 'left', color: '#64748b', fontSize: '0.85rem' }}>Manager</th>
                                     </tr>
                                 </thead>
                                 <tbody>
                                     {sortedHistory.map((item: any) => (
-                                        <tr key={item.id} style={{ borderBottom: '1px solid #f0f0f0', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = '#fafafa'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
+                                        <tr key={item.id} style={{ borderBottom: '1px solid #f1f5f9', transition: 'background 0.2s' }} onMouseEnter={(e) => e.currentTarget.style.background = '#fafafa'} onMouseLeave={(e) => e.currentTarget.style.background = 'transparent'}>
                                             <td style={{ padding: '12px 10px' }} title={item.timestamp.toLocaleString()}>
                                                 <div className={styles.receivedTime} style={{ fontWeight: '700', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '5px' }}>
                                                     {item.timestamp.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
@@ -443,6 +545,11 @@ export default function Home() {
                                             <td style={{ padding: '12px 10px' }}>
                                                 <div className={styles.locationText}>{item.location}</div>
                                             </td>
+                                            <td style={{ padding: '12px 10px', maxWidth: '200px' }}>
+                                                <div style={{ fontSize: '0.75rem', color: '#64748b', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }} title={item.message}>
+                                                    {item.message || '-'}
+                                                </div>
+                                            </td>
                                             <td style={{ padding: '12px 10px' }}>
                                                 <span style={{
                                                     fontSize: '0.8rem',
@@ -463,6 +570,10 @@ export default function Home() {
                     </>
                 ) : view === 'analytics' ? (
                     <AnalyticsView data={filteredHistory as any} />
+                ) : view === 'customers' ? (
+                    <CustomerView bookings={filteredHistory as any} />
+                ) : view === 'financials' ? (
+                    <FinancialView bookings={filteredHistory as any} />
                 ) : (
                     <CalendarView bookings={filteredHistory as any} />
                 )}
@@ -480,6 +591,6 @@ export default function Home() {
                     </div>
                 ))}
             </div>
-        </main>
+        </main >
     );
 }
