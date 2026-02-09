@@ -10,6 +10,7 @@ import { playCashRegisterSound } from './utils/audio';
 import { getManagerForLocation } from './utils/managers';
 import { LayoutDashboard, BarChart3, Calendar as CalendarDays, Settings, ShieldCheck, UserCircle } from 'lucide-react';
 import styles from './page.module.css';
+import simulatedData from '../data/simulated_bookings.json';
 
 interface AlertItem extends AlertProps {
     id: string;
@@ -80,15 +81,35 @@ export default function Home() {
             try {
                 const res = await fetch('/api/get-history');
                 const data = await res.json();
+                let historyData: AlertItem[] = [];
                 if (data.success && data.history) {
-                    const formatted = data.history.map((item: any) => ({
+                    historyData = data.history.map((item: any) => ({
                         ...item,
                         timestamp: new Date(item.timestamp)
                     }));
-                    setBookingHistory(formatted);
                 }
+
+                // Merge simulated data
+                const simulated = simulatedData.map((item: any) => ({
+                    ...item,
+                    timestamp: new Date(item.timestamp),
+                    platform: item.platform as any // Ensure type compatibility
+                }));
+
+                // Avoid duplicates based on ID
+                const existingIds = new Set(historyData.map((h: any) => h.id));
+                const uniqueSimulated = simulated.filter((s: any) => !existingIds.has(s.id));
+
+                setBookingHistory([...uniqueSimulated, ...historyData] as AlertItem[]);
             } catch (e) {
                 console.error("Failed to load history", e);
+                // If API fails, still load simulated data
+                const simulated = simulatedData.map((item: any) => ({
+                    ...item,
+                    timestamp: new Date(item.timestamp),
+                    platform: item.platform as any
+                }));
+                setBookingHistory(simulated as AlertItem[]);
             } finally {
                 setIsHistoryLoaded(true);
             }
@@ -388,11 +409,21 @@ export default function Home() {
                                             </td>
                                             <td style={{ padding: '12px 10px' }}>
                                                 <div style={{ fontWeight: '700', color: '#0369a1' }}>
-                                                    {formatGameDate(item.gameDate)}
+                                                    {item.gameDate === 'TBD' || item.gameDate === 'MISSING' ? (
+                                                        <span className={styles.missingBadge}>TBD</span>
+                                                    ) : (
+                                                        formatGameDate(item.gameDate)
+                                                    )}
                                                 </div>
                                             </td>
                                             <td style={{ padding: '12px 10px' }}>
-                                                <div className={styles.gameTime}>{item.gameTime || item.bookingSlot || '-'}</div>
+                                                <div className={styles.gameTime}>
+                                                    {(item.gameTime === 'MISSING' || item.bookingSlot === 'MISSING') ? (
+                                                        <span className={styles.missingBadge}>MISSING</span>
+                                                    ) : (
+                                                        item.gameTime || item.bookingSlot || '-'
+                                                    )}
+                                                </div>
                                             </td>
                                             <td style={{ padding: '12px 10px' }}>
                                                 <span
