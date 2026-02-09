@@ -492,6 +492,24 @@
     }
 }
 
+.missingBadge {
+    display: inline-block;
+    background: #fee2e2;
+    color: #ef4444;
+    padding: 2px 8px;
+    border-radius: 4px;
+    font-size: 0.75rem;
+    font-weight: 800;
+    border: 1px solid #fca5a5;
+    animation: pulseRed 2s infinite;
+}
+
+@keyframes pulseRed {
+    0% { opacity: 1; }
+    50% { opacity: 0.7; }
+    100% { opacity: 1; }
+}
+
 @media (max-width: 768px) {
     .main {
         padding: 0.5rem;
