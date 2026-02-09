@@ -35,3 +35,8 @@ next-env.d.ts
 
 # firebase
 .firebase
+
+# python
+__pycache__/
+*.py[cod]
+*$py.class

@@ -39,7 +39,7 @@ function extractDateOnly(slot: string): string {
     if (districtMatch) return districtMatch[1];
 
     // Look for formats: 2026-02-06, Feb 4, 31-01-2026, 06 Feb '26 etc.
-    const dateMatch = slot.match(/(\d{4}-\d{2}-\d{2})|(\d{1,2}-\d{1,2}-\d{4})|(\d{1,2}\s+\w{3},?\s*\d{4})|(\w{3},?\s+\d{1,2},?\s*\d{4})|(\d{1,2}\s+\w{3}\s+'\d{2})|(\w{3}\s+\d{1,2})/i);
+    const dateMatch = slot.match(/(\d{4}-\d{2}-\d{2})|(\d{1,2}-\d{1,2}-\d{4})|(\d{1,2}\s+\w{3},?\s*\d{4})|(\w{3},?\s+\d{1,2},?\s*\d{4})|(\d{1,2}\s+\w{3}\s+'\d{2})|(\w{3}\s+\d{1,2})|(\d{1,2}\s+\w{3})/i);
     return dateMatch ? dateMatch[0] : "";
 }
 
@@ -148,7 +148,7 @@ function extractBookingName(text: string): string {
                 const isGarbage = garbageBlocklist.some(g => lowerName.includes(g));
 
                 // Use word boundaries for forbidden keywords to avoid false positives (e.g., "it" in "Smiti")
-                const forbiddenKeywords = ['thank', 'you', 'dear', 'team', 'booking', 'it', 'is', 'the', 'your', 'a new', 'a booking', 'a completed', 'details', 'agreement'];
+                const forbiddenKeywords = ['thank', 'you', 'dear', 'team', 'booking', 'it', 'is', 'the', 'your', 'a new', 'a booking', 'a completed', 'details', 'agreement', 'user', 'customer', 'buyer'];
                 const isForbidden = forbiddenKeywords.some(kw => {
                     const regex = new RegExp(`\\b${kw}\\b`, 'i');
                     return regex.test(lowerName);

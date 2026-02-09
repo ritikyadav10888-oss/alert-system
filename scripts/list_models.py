@@ -1,12 +1,12 @@
 import requests
 import os
 from dotenv import load_dotenv
-import json
 
 load_dotenv('.env.local')
 key = os.getenv('GEMINI_API_KEY')
 # Trim whitespace just in case
-if key: key = key.strip()
+if key:
+    key = key.strip()
 
 print(f"Key: {key[:5]}...")
 

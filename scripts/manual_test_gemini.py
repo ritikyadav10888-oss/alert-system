@@ -1,6 +1,5 @@
 import requests
 import os
-import json
 from dotenv import load_dotenv
 
 load_dotenv('.env.local')
@@ -17,17 +16,17 @@ models_to_try = [
 
 versions = ["v1beta", "v1"]
 
+
 for version in versions:
     for model in models_to_try:
         print(f"Testing {model} ({version})...")
         url = f"https://generativelanguage.googleapis.com/{version}/models/{model}:generateContent?key={GEMINI_API_KEY}"
-        
+
         payload = {
             "contents": [{
                 "parts": [{"text": "Hello, simply say 'OK'"}]
             }]
         }
-        
         try:
             response = requests.post(url, json=payload, headers={'Content-Type': 'application/json'}, timeout=10)
             if response.status_code == 200:
