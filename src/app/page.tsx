@@ -177,71 +177,7 @@ export default function Home() {
 
     const isSyncingRef = useRef(false);
 
-    const checkEmails = useCallback(async (retries = 1, depth = '') => {
-        if (!isLiveSync || isSyncingRef.current || !isHistoryLoaded || !isRoleSet) return;
-        isSyncingRef.current = true;
-        setSyncStatus(depth === 'all' ? 'Deep Scanning...' : 'Syncing...');
-
-        try {
-            const res = await fetch(`/api/check-emails${depth === 'all' ? '?depth=all' : ''}`);
-            const data = await res.json();
-
-            if (data.success) {
-                if (data.alerts && data.alerts.length > 0) {
-                    setSyncStatus(`Updated ${data.alerts.length} items`);
-                    setBookingHistory(prev => {
-                        const newHistory = [...prev];
-                        data.alerts.forEach((a: any) => {
-                            const idx = newHistory.findIndex(h => h.id === a.id);
-                            const formatted = { ...a, timestamp: new Date(a.timestamp) };
-                            if (idx === -1) newHistory.push(formatted);
-                            else newHistory[idx] = formatted;
-                        });
-                        return newHistory;
-                    });
-
-                    data.alerts.forEach((a: any) => {
-                        const alertDate = new Date(a.timestamp);
-                        const isLive = (Date.now() - alertDate.getTime()) < 60 * 60 * 1000 && depth !== 'all';
-                        const isRelevant = userRole === 'owner' || a.location === managerLocation;
-
-                        if (isRelevant) {
-                            triggerAutoAlert(a.platform, a.location, a.message, a.bookingSlot, a.sport, isLive, alertDate, a.id, a.gameDate, a.gameTime, a.bookingName, a.paidAmount);
-                        }
-                    });
-                } else {
-                    setSyncStatus(depth === 'all' ? 'Deep Sync Complete' : 'Sync Active');
-                }
-                setLastSyncTime(new Date());
-            }
-        } catch (error) {
-            console.error("Sync error:", error);
-        } finally {
-            isSyncingRef.current = false;
-        }
-    }, [isLiveSync, isHistoryLoaded, isRoleSet, userRole, managerLocation, bookingHistory]);
-
-    const handleDeepSync = () => {
-        if (confirm("Scan entire inbox?")) checkEmails(1, 'all');
-    };
-
-    useEffect(() => {
-        if (isHistoryLoaded && isRoleSet) checkEmails();
-        const interval = setInterval(checkEmails, 60000);
-        return () => clearInterval(interval);
-    }, [isLiveSync, isHistoryLoaded, isRoleSet]);
-
-    const handleClearHistory = async () => {
-        if (!confirm("Clear history?")) return;
-        try {
-            const res = await fetch('/api/clear-history', { method: 'POST' });
-            if ((await res.json()).success) setBookingHistory([]);
-        } catch (e) { }
-    };
-
-    const notifiedSessionIds = useRef<Set<string>>(new Set());
-
-    const triggerAutoAlert = (
+    const triggerAutoAlert = useCallback((
         platform: 'Playo' | 'Hudle' | 'District' | 'Khelomore' | 'System',
         location: string,
         msg: string,
@@ -290,7 +226,73 @@ export default function Home() {
             if (prev.some(item => item.id === alertId)) return prev;
             return [newAlert, ...prev];
         });
+    }, [bookingHistory]);
+
+    const checkEmails = useCallback(async (retries = 1, depth = '') => {
+        if (!isLiveSync || isSyncingRef.current || !isHistoryLoaded || !isRoleSet) return;
+        isSyncingRef.current = true;
+        setSyncStatus(depth === 'all' ? 'Deep Scanning...' : 'Syncing...');
+
+        try {
+            const res = await fetch(`/api/check-emails${depth === 'all' ? '?depth=all' : ''}`);
+            const data = await res.json();
+
+            if (data.success) {
+                if (data.alerts && data.alerts.length > 0) {
+                    setSyncStatus(`Updated ${data.alerts.length} items`);
+                    setBookingHistory(prev => {
+                        const newHistory = [...prev];
+                        data.alerts.forEach((a: any) => {
+                            const idx = newHistory.findIndex(h => h.id === a.id);
+                            const formatted = { ...a, timestamp: new Date(a.timestamp) };
+                            if (idx === -1) newHistory.push(formatted);
+                            else newHistory[idx] = formatted;
+                        });
+                        return newHistory;
+                    });
+
+                    data.alerts.forEach((a: any) => {
+                        const alertDate = new Date(a.timestamp);
+                        const isLive = (Date.now() - alertDate.getTime()) < 60 * 60 * 1000 && depth !== 'all';
+                        const isRelevant = userRole === 'owner' || a.location === managerLocation;
+
+                        if (isRelevant) {
+                            triggerAutoAlert(a.platform, a.location, a.message, a.bookingSlot, a.sport, isLive, alertDate, a.id, a.gameDate, a.gameTime, a.bookingName, a.paidAmount);
+                        }
+                    });
+                } else {
+                    setSyncStatus(depth === 'all' ? 'Deep Sync Complete' : 'Sync Active');
+                }
+                setLastSyncTime(new Date());
+            }
+        } catch (error) {
+            console.error("Sync error:", error);
+        } finally {
+            isSyncingRef.current = false;
+        }
+    }, [isLiveSync, isHistoryLoaded, isRoleSet, userRole, managerLocation, bookingHistory, triggerAutoAlert]);
+
+    const handleDeepSync = () => {
+        if (confirm("Scan entire inbox?")) checkEmails(1, 'all');
     };
+
+    useEffect(() => {
+        if (isHistoryLoaded && isRoleSet) checkEmails();
+        const interval = setInterval(checkEmails, 60000);
+        return () => clearInterval(interval);
+    }, [isLiveSync, isHistoryLoaded, isRoleSet, checkEmails]);
+
+    const handleClearHistory = async () => {
+        if (!confirm("Clear history?")) return;
+        try {
+            const res = await fetch('/api/clear-history', { method: 'POST' });
+            if ((await res.json()).success) setBookingHistory([]);
+        } catch (e) { }
+    };
+
+    const notifiedSessionIds = useRef<Set<string>>(new Set());
+
+    // triggerAutoAlert moved up
 
     return (
         <main className={styles.main}>

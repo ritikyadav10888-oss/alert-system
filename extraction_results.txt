@@ -1,5 +1,0 @@
-Sample: District Purchase | Extracted: [Sagar Jogale]
-Sample: District Agreement | Extracted: [Ayush Singhal
-        Paid]
-Sample: Hudle Booking | Extracted: [Kiran Dhanak]
-Sample: Hudle Summary | Extracted: [Smiti Motwani]

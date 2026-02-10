@@ -1,4 +1,4 @@
-import { sendTelegramAlert } from './src/app/utils/webhooks';
+import { sendTelegramAlert } from '../src/app/utils/webhooks';
 import dotenv from 'dotenv';
 dotenv.config({ path: '.env.local' });
 
