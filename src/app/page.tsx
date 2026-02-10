@@ -236,7 +236,7 @@ export default function Home() {
 
         try {
             const res = await fetch(`/api/check-emails${depth === 'all' ? '?depth=all' : ''}`, {
-                headers: { 'x-api-key': process.env.NEXT_PUBLIC_API_SECRET || '' }
+                headers: { 'x-api-key': (process.env.NEXT_PUBLIC_API_SECRET || '').trim() }
             });
             const data = await res.json();
 
@@ -307,7 +307,7 @@ export default function Home() {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'x-api-key': process.env.NEXT_PUBLIC_API_SECRET || ''
+                    'x-api-key': (process.env.NEXT_PUBLIC_API_SECRET || '').trim()
                 },
                 body: JSON.stringify({ id })
             });
