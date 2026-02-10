@@ -176,6 +176,7 @@ export default function Home() {
     const sortedHistory = [...filteredHistory].sort((a, b) => b.timestamp.getTime() - a.timestamp.getTime());
 
     const isSyncingRef = useRef(false);
+    const notifiedSessionIds = useRef<Set<string>>(new Set());
 
     const triggerAutoAlert = useCallback((
         platform: 'Playo' | 'Hudle' | 'District' | 'Khelomore' | 'System',
@@ -295,9 +296,34 @@ export default function Home() {
         } catch (e) { }
     };
 
-    const notifiedSessionIds = useRef<Set<string>>(new Set());
+    // ... (previous code)
 
-    // triggerAutoAlert moved up
+    const handleDeleteBooking = async (id: string, e: React.MouseEvent) => {
+        e.stopPropagation();
+        if (!confirm("Are you sure you want to permanently delete this booking?")) return;
+
+        try {
+            const res = await fetch('/api/delete-booking', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': process.env.NEXT_PUBLIC_API_SECRET || ''
+                },
+                body: JSON.stringify({ id })
+            });
+            const data = await res.json();
+            if (data.success) {
+                setBookingHistory(prev => prev.filter(item => item.id !== id));
+                // Also remove from local alerts if present
+                setAlerts(prev => prev.filter(item => item.id !== id));
+            } else {
+                alert("Failed to delete: " + data.message);
+            }
+        } catch (err) {
+            console.error(err);
+            alert("Error deleting booking");
+        }
+    };
 
     return (
         <main className={styles.main}>
@@ -383,19 +409,30 @@ export default function Home() {
                                         }}>
                                             {item.platform}
                                         </div>
-                                        <div className={styles.receivedTime}>
-                                            {item.timestamp.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
-                                            {Date.now() - item.timestamp.getTime() < 120000 && (
-                                                <span style={{
-                                                    fontSize: '0.65rem',
-                                                    background: '#4ade80',
-                                                    color: '#fff',
-                                                    padding: '1px 5px',
-                                                    borderRadius: '10px',
-                                                    animation: 'pulse 1.5s infinite',
-                                                    fontWeight: 'bold',
-                                                    marginLeft: '5px'
-                                                }}>NEW</span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                            <div className={styles.receivedTime}>
+                                                {item.timestamp.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' })}
+                                                {Date.now() - item.timestamp.getTime() < 120000 && (
+                                                    <span style={{
+                                                        fontSize: '0.65rem',
+                                                        background: '#4ade80',
+                                                        color: '#fff',
+                                                        padding: '1px 5px',
+                                                        borderRadius: '10px',
+                                                        animation: 'pulse 1.5s infinite',
+                                                        fontWeight: 'bold',
+                                                        marginLeft: '5px'
+                                                    }}>NEW</span>
+                                                )}
+                                            </div>
+                                            {userRole === 'owner' && (
+                                                <button
+                                                    onClick={(e) => handleDeleteBooking(item.id, e)}
+                                                    style={{ background: 'none', border: 'none', cursor: 'pointer', padding: '0 4px', color: '#ef4444' }}
+                                                    title="Delete Booking"
+                                                >
+                                                    🗑️
+                                                </button>
                                             )}
                                         </div>
                                     </div>
@@ -471,6 +508,7 @@ export default function Home() {
                                         <th style={{ padding: '15px 10px', textAlign: 'left', color: '#64748b', fontSize: '0.85rem' }}>Location</th>
                                         <th style={{ padding: '15px 10px', textAlign: 'left', color: '#64748b', fontSize: '0.85rem' }}>Details</th>
                                         <th style={{ padding: '15px 10px', textAlign: 'left', color: '#64748b', fontSize: '0.85rem' }}>Manager</th>
+                                        {userRole === 'owner' && <th style={{ padding: '15px 10px', textAlign: 'left', color: '#64748b', fontSize: '0.85rem' }}>Actions</th>}
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -569,6 +607,24 @@ export default function Home() {
                                                     {getManagerForLocation(item.location).name}
                                                 </span>
                                             </td>
+                                            {userRole === 'owner' && (
+                                                <td style={{ padding: '12px 10px' }}>
+                                                    <button
+                                                        onClick={(e) => handleDeleteBooking(item.id, e)}
+                                                        style={{
+                                                            background: '#fee2e2',
+                                                            border: '1px solid #fca5a5',
+                                                            color: '#b91c1c',
+                                                            borderRadius: '6px',
+                                                            padding: '4px 8px',
+                                                            cursor: 'pointer',
+                                                            fontSize: '0.75rem'
+                                                        }}
+                                                    >
+                                                        Delete
+                                                    </button>
+                                                </td>
+                                            )}
                                         </tr>
                                     ))}
                                 </tbody>

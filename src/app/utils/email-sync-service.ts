@@ -582,6 +582,29 @@ export async function syncEmails(depth: string = 'standard') {
                         }
                     }
 
+                    // 🗓️ DATE VALIDATION: Prevent processing of historical data
+                    const isAncientHistory = (() => {
+                        if (!gameDate || gameDate === 'MISSING' || gameDate === 'TBD') return false;
+                        try {
+                            const dateStr = gameDate.replace(/'(\d{2})/, '20$1');
+                            const gDate = new Date(dateStr);
+                            const now = new Date();
+                            const diffTime = Math.abs(now.getTime() - gDate.getTime());
+                            const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                            // If older than 30 days AND not running a "deep" sync, skip it
+                            // Also check if date is valid
+                            if (!isNaN(gDate.getTime()) && diffDays > 30 && depth !== 'all' && gDate < now) {
+                                return true;
+                            }
+                        } catch (e) { }
+                        return false;
+                    })();
+
+                    if (isAncientHistory) {
+                        console.log(`[Sync_Skip] Skipped ancient booking (Date: ${gameDate}) for UID: ${uid}`);
+                        continue;
+                    }
+
                     if (bookingSlot !== 'MISSING' || bookingName !== 'N/A') {
                         alerts.push({
                             id: uid.toString(),
