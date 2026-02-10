@@ -9,13 +9,18 @@ export async function register() {
         cron.schedule('*/1 * * * *', async () => {
             console.log("🔄 Background Sync: Checking for new bookings...");
             try {
-                // Use the local API route to ensure identical logic
                 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
                 const res = await fetch(`${baseUrl}/api/cron`);
-                const data = await res.json();
+                const text = await res.text();
 
-                if (data.success && data.alerts && data.alerts.length > 0) {
-                    console.log(`✅ Background Sync: Found ${data.alerts.length} new alerts.`);
+                try {
+                    const data = JSON.parse(text);
+                    if (data.success && data.alerts && data.alerts.length > 0) {
+                        console.log(`✅ Background Sync: Found ${data.alerts.length} new alerts.`);
+                    }
+                } catch (parseError) {
+                    console.error("❌ Background Sync JSON Parse Error. Response:", text.substring(0, 500)); // Log first 500 chars
+                    throw parseError;
                 }
             } catch (e) {
                 console.error("❌ Background Sync Error:", e);
