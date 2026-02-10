@@ -10,7 +10,9 @@ export async function register() {
             console.log("🔄 Background Sync: Checking for new bookings...");
             try {
                 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-                const res = await fetch(`${baseUrl}/api/cron`);
+                const res = await fetch(`${baseUrl}/api/cron`, {
+                    headers: { 'x-api-key': process.env.API_SECRET || '' }
+                });
                 const text = await res.text();
 
                 try {
@@ -32,7 +34,9 @@ export async function register() {
             console.log("📑 Auto-Pilot: Generating Daily Summary...");
             try {
                 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-                await fetch(`${baseUrl}/api/daily-summary`);
+                await fetch(`${baseUrl}/api/daily-summary`, {
+                    headers: { 'x-api-key': process.env.API_SECRET || '' }
+                });
             } catch (e) {
                 console.error("❌ Daily Summary Error:", e);
             }

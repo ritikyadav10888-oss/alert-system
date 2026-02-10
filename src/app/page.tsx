@@ -234,7 +234,9 @@ export default function Home() {
         setSyncStatus(depth === 'all' ? 'Deep Scanning...' : 'Syncing...');
 
         try {
-            const res = await fetch(`/api/check-emails${depth === 'all' ? '?depth=all' : ''}`);
+            const res = await fetch(`/api/check-emails${depth === 'all' ? '?depth=all' : ''}`, {
+                headers: { 'x-api-key': process.env.NEXT_PUBLIC_API_SECRET || '' }
+            });
             const data = await res.json();
 
             if (data.success) {
@@ -285,7 +287,10 @@ export default function Home() {
     const handleClearHistory = async () => {
         if (!confirm("Clear history?")) return;
         try {
-            const res = await fetch('/api/clear-history', { method: 'POST' });
+            const res = await fetch('/api/clear-history', {
+                method: 'POST',
+                headers: { 'x-api-key': process.env.NEXT_PUBLIC_API_SECRET || '' }
+            });
             if ((await res.json()).success) setBookingHistory([]);
         } catch (e) { }
     };

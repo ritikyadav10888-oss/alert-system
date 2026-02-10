@@ -6,6 +6,14 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
     // Basic auth check if needed (e.g., via a CRON_SECRET env var)
+    const apiKey = request.headers.get('x-api-key');
+    // Allow Vercel Cron (which uses proper CRON_SECRET if configured, but here we use our custom API_SECRET for simplicity across platforms)
+    // In production Vercel Cron, you might want check: request.headers.get('authorization') === `Bearer ${process.env.CRON_SECRET}`
+    // For now, we standardize on x-api-key for our custom instrumentation
+    if (apiKey !== process.env.API_SECRET) {
+        return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
+    }
+
     const { searchParams } = new URL(request.url);
     const depth = searchParams.get('depth') || 'standard';
 
