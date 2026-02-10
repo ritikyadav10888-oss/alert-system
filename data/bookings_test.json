@@ -4327,5 +4327,70 @@
     "paidAmount": "₹1,400",
     "message": "Hudle - Booking #HUD1861573120",
     "timestamp": "2026-01-24T07:53:29.000Z"
+  },
+  {
+    "id": "2202",
+    "platform": "Hudle",
+    "location": "Thane",
+    "bookingSlot": "1. Tue, Feb 10, 2026 9:00 PM - Tue, Feb 10, 2026 9:30 PM | 2. Tue, Feb 10, 2026 9:30 PM - Tue, Feb 10, 2026 10:00 PM | 3. Tue, Feb 10, 2026 10:00 PM - Tue, Feb 10, 2026 10:30 PM | 4. Tue, Feb 10, 2026 10:30 PM - Tue, Feb 10, 2026 11:00 PM",
+    "gameDate": "Feb 10, 2026",
+    "gameTime": "9:00 PM - 11:00 PM",
+    "sport": "Badminton",
+    "bookingName": "Amit Shringarpure",
+    "paidAmount": "₹1,400",
+    "message": "Hudle - Booking #HUD3776972240",
+    "timestamp": "2026-02-10T09:13:49.000Z"
+  },
+  {
+    "id": "2110",
+    "platform": "District",
+    "location": "Thane",
+    "bookingSlot": "MISSING",
+    "gameDate": "",
+    "gameTime": "",
+    "sport": "Badminton",
+    "bookingName": "Kartikey",
+    "paidAmount": "₹600",
+    "message": "You have a new purchase!",
+    "timestamp": "2026-02-07T02:41:44.000Z"
+  },
+  {
+    "id": "1857",
+    "platform": "Playo",
+    "location": "Baner",
+    "bookingSlot": "8:00 PM-9:30 PM on 24-01-2026",
+    "gameDate": "24-01-2026",
+    "gameTime": "8:00 PM - 9:30 PM",
+    "sport": "Football",
+    "bookingName": "Hritik",
+    "paidAmount": "₹890",
+    "message": "[YPKWHZJD] Your Football booking is confirmed!",
+    "timestamp": "2026-01-24T09:36:39.000Z"
+  },
+  {
+    "id": "1854",
+    "platform": "District",
+    "location": "Borivali",
+    "bookingSlot": "MISSING",
+    "gameDate": "",
+    "gameTime": "",
+    "sport": "Badminton",
+    "bookingName": "Subit Kapoor",
+    "paidAmount": "₹950",
+    "message": "You have a new purchase!",
+    "timestamp": "2026-01-24T05:07:37.000Z"
+  },
+  {
+    "id": "2203",
+    "platform": "Khelomore",
+    "location": "Thane",
+    "bookingSlot": "Feb 3, 2026 at 12:32 PM",
+    "gameDate": "Feb 3, 2026",
+    "gameTime": "12:32 PM",
+    "sport": "General",
+    "bookingName": "N/A",
+    "paidAmount": "N/A",
+    "message": "Re: Force Playing Fields - Brahmand (Thane)_3203",
+    "timestamp": "2026-02-10T09:18:19.000Z"
   }
 ]
