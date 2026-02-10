@@ -4,8 +4,15 @@ import { getBookings, saveBookings } from '@/app/utils/db';
 
 export async function POST(request: Request) {
     try {
-        const apiKey = request.headers.get('x-api-key');
-        if (apiKey !== process.env.API_SECRET) {
+        const apiKey = (request.headers.get('x-api-key') || '').trim();
+        const serverSecret = (process.env.API_SECRET || '').trim();
+
+        if (!serverSecret) {
+            console.error("❌ CRITICAL: API_SECRET is missing!");
+            return NextResponse.json({ success: false, message: 'Server config error' }, { status: 500 });
+        }
+
+        if (apiKey !== serverSecret) {
             return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
         }
 

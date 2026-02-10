@@ -11,7 +11,7 @@ export async function register() {
             try {
                 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
                 const res = await fetch(`${baseUrl}/api/cron`, {
-                    headers: { 'x-api-key': process.env.API_SECRET || '' }
+                    headers: { 'x-api-key': (process.env.API_SECRET || '').trim() }
                 });
                 const text = await res.text();
 
