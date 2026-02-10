@@ -24,7 +24,7 @@ const FinancialView: React.FC<FinancialViewProps> = ({ bookings }) => {
         let platformBreakdown: Record<string, number> = {};
 
         bookings.forEach(b => {
-            const amountStr = b.paidAmount.replace(/[^\d.]/g, '');
+            const amountStr = (b.paidAmount || '0').replace(/[^\d.]/g, '');
             const amount = parseFloat(amountStr) || 0;
 
             if (amount > 0) {

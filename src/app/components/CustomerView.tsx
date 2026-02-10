@@ -60,7 +60,7 @@ const CustomerView: React.FC<CustomerViewProps> = ({ bookings }) => {
             profile.bookingCount += 1;
 
             // Clean amount string
-            const amountStr = b.paidAmount.replace(/[^\d.]/g, '');
+            const amountStr = (b.paidAmount || '0').replace(/[^\d.]/g, '');
             const amount = parseFloat(amountStr) || 0;
             profile.totalSpend += amount;
 
