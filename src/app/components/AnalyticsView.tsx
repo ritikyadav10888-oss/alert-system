@@ -74,16 +74,25 @@ export default function AnalyticsView({ data }: AnalyticsViewProps) {
             }
         });
 
-        // Format for Recharts
-        const revenueData = Object.entries(revenueByDate)
-            .map(([date, amount]) => ({ date, amount }))
-            .slice(-14); // Last 14 days
+        // Format for Recharts - Ensure chronological last 14 days
+        const revenueData = [];
+        for (let i = 13; i >= 0; i--) {
+            const d = new Date();
+            d.setDate(d.getDate() - i);
+            const dateKey = d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
+            revenueData.push({
+                date: dateKey,
+                amount: revenueByDate[dateKey] || 0
+            });
+        }
 
         const sportData = Object.entries(revenueBySport)
-            .map(([name, value]) => ({ name, value }));
+            .map(([name, value]) => ({ name, value }))
+            .sort((a, b) => b.value - a.value); // Sort highest first
 
         const locationData = Object.entries(revenueByLocation)
-            .map(([name, amount]) => ({ name, amount }));
+            .map(([name, amount]) => ({ name, amount }))
+            .sort((a, b) => b.amount - a.amount);
 
         const hourData = Array.from({ length: 24 }, (_, i) => ({
             hour: `${i}:00`,
