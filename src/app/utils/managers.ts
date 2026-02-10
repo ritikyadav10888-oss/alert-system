@@ -26,7 +26,7 @@ export const LOCATION_MANAGERS: Record<string, TurfManager> = {
         role: 'Night Manager'
     },
     'Borivali': {
-        name: 'Karan Shah',
+        name: 'Saiyam',
         phone: '+91 94XXX XXXXX',
         role: 'Manager'
     },
