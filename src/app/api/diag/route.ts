@@ -22,7 +22,10 @@ export async function GET() {
         success: true,
         timestamp: new Date().toISOString(),
         node_env: process.env.NODE_ENV,
+        vercel_project_name: process.env.VERCEL_PROJECT_NAME || 'Unknown',
+        vercel_env: process.env.VERCEL_ENV || 'Unknown',
         all_detected_keys: allKeys,
         env_status: status
     });
+
 }
