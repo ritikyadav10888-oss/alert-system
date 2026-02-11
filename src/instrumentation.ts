@@ -10,10 +10,11 @@ export async function register() {
             console.log("🔄 Background Sync: Checking for new bookings...");
             try {
                 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-                const secret = (process.env.MY_CUSTOM_KEY || process.env.ALERT_SYSTEM_SECRET || process.env.API_SECRET || '').trim();
+                const secret = (process.env.MY_CUSTOM_KEY || process.env.ALERT_SYSTEM_SECRET || process.env.API_SECRET || 'secure_alert_sys_2026_x7z9').trim();
                 const res = await fetch(`${baseUrl}/api/cron`, {
                     headers: { 'x-api-key': secret }
                 });
+
 
                 const text = await res.text();
 
@@ -36,10 +37,11 @@ export async function register() {
             console.log("📑 Auto-Pilot: Generating Daily Summary...");
             try {
                 const baseUrl = process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000';
-                const secret = (process.env.MY_CUSTOM_KEY || process.env.ALERT_SYSTEM_SECRET || process.env.API_SECRET || '').trim();
+                const secret = (process.env.MY_CUSTOM_KEY || process.env.ALERT_SYSTEM_SECRET || process.env.API_SECRET || 'secure_alert_sys_2026_x7z9').trim();
                 await fetch(`${baseUrl}/api/daily-summary`, {
                     headers: { 'x-api-key': secret }
                 });
+
 
             } catch (e) {
                 console.error("❌ Daily Summary Error:", e);
