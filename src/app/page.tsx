@@ -80,9 +80,11 @@ export default function Home() {
 
         const loadHistory = async () => {
             try {
+                const secret = (process.env.NEXT_PUBLIC_ALERT_SYSTEM_SECRET || process.env.NEXT_PUBLIC_API_SECRET || '').trim();
                 const res = await fetch('/api/get-history', {
-                    headers: { 'x-api-key': (process.env.NEXT_PUBLIC_API_SECRET || '').trim() }
+                    headers: { 'x-api-key': secret }
                 });
+
                 const data = await res.json();
                 if (data.success && data.history) {
                     const formatted = data.history.map((item: any) => ({
@@ -141,11 +143,12 @@ export default function Home() {
                 applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!)
             });
 
+            const secret = (process.env.NEXT_PUBLIC_ALERT_SYSTEM_SECRET || process.env.NEXT_PUBLIC_API_SECRET || '').trim();
             await fetch('/api/push-subscription', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'x-api-key': (process.env.NEXT_PUBLIC_API_SECRET || '').trim()
+                    'x-api-key': secret
                 },
                 body: JSON.stringify({ subscription, location: selectedLocation })
             });
