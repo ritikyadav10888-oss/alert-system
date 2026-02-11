@@ -16,6 +16,11 @@ const withPWA = require("next-pwa")({
     ],
     runtimeCaching: [
         {
+            // Do not cache API routes
+            urlPattern: /^\/api\/.*$/,
+            handler: 'NetworkOnly',
+        },
+        {
             urlPattern: /^https?.*/,
             handler: 'NetworkFirst',
             options: {
@@ -26,6 +31,7 @@ const withPWA = require("next-pwa")({
             },
         },
     ],
+
 });
 
 const nextConfig = {

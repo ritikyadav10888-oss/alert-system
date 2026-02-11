@@ -17,10 +17,11 @@ export async function GET() {
         'KV_URL': process.env.KV_URL ? `✅ PRESENT (${process.env.KV_URL.length})` : '❌ MISSING',
     };
 
-
     return NextResponse.json({
         success: true,
+        version: "V3_FORCE_FRESH_3", // CHANGED THIS
         timestamp: new Date().toISOString(),
+
         node_env: process.env.NODE_ENV,
         vercel_project_name: process.env.VERCEL_PROJECT_NAME || 'Unknown',
         vercel_env: process.env.VERCEL_ENV || 'Unknown',
