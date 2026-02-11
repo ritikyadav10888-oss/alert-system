@@ -6,15 +6,16 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(req: Request) {
     const apiKey = (req.headers.get('x-api-key') || '').trim();
-    const serverSecret = (process.env.API_SECRET || '').trim();
+    const serverSecret = (process.env.MY_CUSTOM_KEY || process.env.ALERT_SYSTEM_SECRET || process.env.API_SECRET || '').trim();
 
     if (!serverSecret) {
-        console.error("❌ CRITICAL: API_SECRET is missing!");
+        console.error("❌ CRITICAL: Secret is missing!");
         return NextResponse.json({
             success: false,
-            message: 'Server config error: Missing API_SECRET'
+            message: 'Server config error: Missing secret'
         }, { status: 500 });
     }
+
 
     if (apiKey !== serverSecret) {
         return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });

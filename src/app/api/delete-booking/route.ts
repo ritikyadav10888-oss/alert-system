@@ -5,16 +5,17 @@ import { getBookings, saveBookings } from '@/app/utils/db';
 export async function POST(request: Request) {
     try {
         const apiKey = (request.headers.get('x-api-key') || '').trim();
-        const serverSecret = (process.env.ALERT_SYSTEM_SECRET || process.env.API_SECRET || '').trim();
+        const serverSecret = (process.env.MY_CUSTOM_KEY || process.env.ALERT_SYSTEM_SECRET || process.env.API_SECRET || '').trim();
 
         if (!serverSecret) {
             console.error("❌ CRITICAL: Security secret is missing!");
             return NextResponse.json({
                 success: false,
                 message: 'Server config error: Missing secret',
-                diagnostics: 'Check ALERT_SYSTEM_SECRET'
+                diagnostics: 'Check MY_CUSTOM_KEY'
             }, { status: 500 });
         }
+
 
         if (apiKey !== serverSecret) {
             console.warn(`[Auth_Fail] Delete attempt with invalid key: "${apiKey.substring(0, 3)}..."`);

@@ -7,16 +7,17 @@ export const dynamic = 'force-dynamic';
 export async function GET(req: Request) {
     // Basic auth check if needed (e.g., via a CRON_SECRET env var)
     const apiKey = (req.headers.get('x-api-key') || '').trim();
-    const serverSecret = (process.env.ALERT_SYSTEM_SECRET || process.env.API_SECRET || '').trim();
+    const serverSecret = (process.env.MY_CUSTOM_KEY || process.env.ALERT_SYSTEM_SECRET || process.env.API_SECRET || '').trim();
 
     if (!serverSecret) {
         console.error("❌ CRITICAL: Security secret is missing!");
         return NextResponse.json({
             success: false,
             message: 'Server configuration error: Missing Security Secret',
-            diagnostics: 'Please check ALERT_SYSTEM_SECRET in Vercel'
+            diagnostics: 'Please check MY_CUSTOM_KEY in Vercel'
         }, { status: 500 });
     }
+
 
 
     if (apiKey !== serverSecret) {

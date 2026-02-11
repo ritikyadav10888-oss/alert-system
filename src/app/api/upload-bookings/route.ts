@@ -11,15 +11,17 @@ export async function POST(req: Request) {
 
         // Standardized security check (Shared Secret)
         const apiKey = (req.headers.get('x-api-key') || '').trim();
-        const serverSecret = (process.env.API_SECRET || '').trim();
+        const serverSecret = (process.env.MY_CUSTOM_KEY || process.env.ALERT_SYSTEM_SECRET || process.env.API_SECRET || '').trim();
 
         if (!serverSecret) {
-            console.error("❌ CRITICAL: API_SECRET is missing!");
+            console.error("❌ CRITICAL: Security secret is missing!");
             return NextResponse.json({
                 success: false,
-                message: 'Server config error: Missing API_SECRET'
+                message: 'Server config error: Missing secret',
+                diagnostics: 'Check MY_CUSTOM_KEY'
             }, { status: 500 });
         }
+
 
         if (apiKey !== serverSecret) {
             console.error('[Upload API] Invalid API Key');

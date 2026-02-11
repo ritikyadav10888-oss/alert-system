@@ -3,7 +3,7 @@ import { saveSubscription } from '@/app/utils/subscriptions';
 
 export async function POST(req: Request) {
     const apiKey = (req.headers.get('x-api-key') || '').trim();
-    const serverSecret = (process.env.ALERT_SYSTEM_SECRET || process.env.API_SECRET || '').trim();
+    const serverSecret = (process.env.MY_CUSTOM_KEY || process.env.ALERT_SYSTEM_SECRET || process.env.API_SECRET || '').trim();
 
     if (!serverSecret) {
         console.error("❌ CRITICAL: Secret is missing!");
@@ -12,6 +12,7 @@ export async function POST(req: Request) {
             message: 'Server config error: Missing secret'
         }, { status: 500 });
     }
+
 
     if (apiKey !== serverSecret) {
         return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });

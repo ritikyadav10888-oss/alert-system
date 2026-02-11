@@ -80,10 +80,11 @@ export default function Home() {
 
         const loadHistory = async () => {
             try {
-                const secret = (process.env.NEXT_PUBLIC_ALERT_SYSTEM_SECRET || process.env.NEXT_PUBLIC_API_SECRET || '').trim();
+                const secret = (process.env.NEXT_PUBLIC_MY_CUSTOM_KEY || process.env.NEXT_PUBLIC_ALERT_SYSTEM_SECRET || process.env.NEXT_PUBLIC_API_SECRET || '').trim();
                 const res = await fetch('/api/get-history', {
                     headers: { 'x-api-key': secret }
                 });
+
 
                 const data = await res.json();
                 if (data.success && data.history) {
@@ -143,7 +144,7 @@ export default function Home() {
                 applicationServerKey: urlBase64ToUint8Array(process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY!)
             });
 
-            const secret = (process.env.NEXT_PUBLIC_ALERT_SYSTEM_SECRET || process.env.NEXT_PUBLIC_API_SECRET || '').trim();
+            const secret = (process.env.NEXT_PUBLIC_MY_CUSTOM_KEY || process.env.NEXT_PUBLIC_ALERT_SYSTEM_SECRET || process.env.NEXT_PUBLIC_API_SECRET || '').trim();
             await fetch('/api/push-subscription', {
                 method: 'POST',
                 headers: {
@@ -152,6 +153,7 @@ export default function Home() {
                 },
                 body: JSON.stringify({ subscription, location: selectedLocation })
             });
+
 
             setPushStatus('enabled');
             alert(`🔔 Success! Notifications enabled for ${selectedLocation}.`);
@@ -243,9 +245,11 @@ export default function Home() {
         setSyncStatus(depth === 'all' ? 'Deep Scanning...' : 'Syncing...');
 
         try {
+            const secret = (process.env.NEXT_PUBLIC_MY_CUSTOM_KEY || process.env.NEXT_PUBLIC_ALERT_SYSTEM_SECRET || process.env.NEXT_PUBLIC_API_SECRET || '').trim();
             const res = await fetch(`/api/check-emails${depth === 'all' ? '?depth=all' : ''}`, {
-                headers: { 'x-api-key': (process.env.NEXT_PUBLIC_API_SECRET || '').trim() }
+                headers: { 'x-api-key': secret }
             });
+
             const data = await res.json();
 
             if (data.success) {
@@ -296,10 +300,12 @@ export default function Home() {
     const handleClearHistory = async () => {
         if (!confirm("Clear history?")) return;
         try {
+            const secret = (process.env.NEXT_PUBLIC_MY_CUSTOM_KEY || process.env.NEXT_PUBLIC_ALERT_SYSTEM_SECRET || process.env.NEXT_PUBLIC_API_SECRET || '').trim();
             const res = await fetch('/api/clear-history', {
                 method: 'POST',
-                headers: { 'x-api-key': process.env.NEXT_PUBLIC_API_SECRET || '' }
+                headers: { 'x-api-key': secret }
             });
+
             if ((await res.json()).success) setBookingHistory([]);
         } catch (e) { }
     };
@@ -311,14 +317,16 @@ export default function Home() {
         if (!confirm("Are you sure you want to permanently delete this booking?")) return;
 
         try {
+            const secret = (process.env.NEXT_PUBLIC_MY_CUSTOM_KEY || process.env.NEXT_PUBLIC_ALERT_SYSTEM_SECRET || process.env.NEXT_PUBLIC_API_SECRET || '').trim();
             const res = await fetch('/api/delete-booking', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
-                    'x-api-key': (process.env.NEXT_PUBLIC_API_SECRET || '').trim()
+                    'x-api-key': secret
                 },
                 body: JSON.stringify({ id })
             });
+
             const data = await res.json();
             if (data.success) {
                 setBookingHistory(prev => prev.filter(item => item.id !== id));
