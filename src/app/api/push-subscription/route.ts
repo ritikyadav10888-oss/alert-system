@@ -2,6 +2,21 @@ import { NextResponse } from 'next/server';
 import { saveSubscription } from '@/app/utils/subscriptions';
 
 export async function POST(req: Request) {
+    const apiKey = (req.headers.get('x-api-key') || '').trim();
+    const serverSecret = (process.env.API_SECRET || '').trim();
+
+    if (!serverSecret) {
+        console.error("❌ CRITICAL: API_SECRET is missing!");
+        return NextResponse.json({
+            success: false,
+            message: 'Server config error: Missing API_SECRET'
+        }, { status: 500 });
+    }
+
+    if (apiKey !== serverSecret) {
+        return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
+    }
+
     try {
         const data = await req.json();
 
@@ -13,7 +28,12 @@ export async function POST(req: Request) {
 
         return NextResponse.json({ success: true, message: 'Subscription saved' });
     } catch (e: any) {
-        console.error("Failed to save subscription", e);
-        return NextResponse.json({ success: false, message: e.message }, { status: 500 });
+        console.error("[API_Error] Failed to save subscription:", e);
+        return NextResponse.json({
+            success: false,
+            message: 'Internal Server Error',
+            error: e.message
+        }, { status: 500 });
     }
 }
+

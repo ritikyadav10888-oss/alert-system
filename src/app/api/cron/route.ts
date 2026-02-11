@@ -6,13 +6,21 @@ export const dynamic = 'force-dynamic';
 
 export async function GET(request: Request) {
     // Basic auth check if needed (e.g., via a CRON_SECRET env var)
-    const apiKey = request.headers.get('x-api-key');
-    // Allow Vercel Cron (which uses proper CRON_SECRET if configured, but here we use our custom API_SECRET for simplicity across platforms)
-    // In production Vercel Cron, you might want check: request.headers.get('authorization') === `Bearer ${process.env.CRON_SECRET}`
-    // For now, we standardize on x-api-key for our custom instrumentation
-    if (apiKey !== process.env.API_SECRET) {
+    const apiKey = (request.headers.get('x-api-key') || '').trim();
+    const serverSecret = (process.env.API_SECRET || '').trim();
+
+    if (!serverSecret) {
+        console.error("❌ CRITICAL: API_SECRET is missing!");
+        return NextResponse.json({
+            success: false,
+            message: 'Server config error: Missing API_SECRET'
+        }, { status: 500 });
+    }
+
+    if (apiKey !== serverSecret) {
         return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
     }
+
 
     const { searchParams } = new URL(request.url);
     const depth = searchParams.get('depth') || 'standard';
@@ -44,7 +52,12 @@ export async function GET(request: Request) {
 
         return NextResponse.json(result);
     } catch (error: any) {
-        console.error("Cron Job Failed:", error);
-        return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+        console.error("[Cron_Fatal] Job Failed:", error);
+        return NextResponse.json({
+            success: false,
+            message: 'Internal Server Error',
+            error: error.message
+        }, { status: 500 });
     }
 }
+

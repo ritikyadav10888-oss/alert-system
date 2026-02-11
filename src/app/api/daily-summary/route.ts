@@ -4,7 +4,22 @@ import { sendDiscordAlert, sendTelegramAlert } from '../../utils/webhooks';
 
 export const dynamic = 'force-dynamic';
 
-export async function GET() {
+export async function GET(req: Request) {
+    const apiKey = (req.headers.get('x-api-key') || '').trim();
+    const serverSecret = (process.env.API_SECRET || '').trim();
+
+    if (!serverSecret) {
+        console.error("❌ CRITICAL: API_SECRET is missing!");
+        return NextResponse.json({
+            success: false,
+            message: 'Server config error: Missing API_SECRET'
+        }, { status: 500 });
+    }
+
+    if (apiKey !== serverSecret) {
+        return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
+    }
+
     try {
         const historyData = await kv.get('booking_history');
         if (!historyData) return NextResponse.json({ success: false, message: 'No history found' });
@@ -66,7 +81,11 @@ export async function GET() {
 
         return NextResponse.json({ success: true, revenue: totalRevenue, count: todayBookings.length });
     } catch (e: any) {
-        console.error("Summary error:", e);
-        return NextResponse.json({ success: false, error: e.message }, { status: 500 });
+        console.error("[API_Error] Daily Summary failed:", e);
+        return NextResponse.json({
+            success: false,
+            message: 'Internal Server Error',
+            error: e.message
+        }, { status: 500 });
     }
 }

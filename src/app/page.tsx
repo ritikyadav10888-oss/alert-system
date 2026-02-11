@@ -80,7 +80,9 @@ export default function Home() {
 
         const loadHistory = async () => {
             try {
-                const res = await fetch('/api/get-history');
+                const res = await fetch('/api/get-history', {
+                    headers: { 'x-api-key': (process.env.NEXT_PUBLIC_API_SECRET || '').trim() }
+                });
                 const data = await res.json();
                 if (data.success && data.history) {
                     const formatted = data.history.map((item: any) => ({
@@ -141,7 +143,10 @@ export default function Home() {
 
             await fetch('/api/push-subscription', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers: {
+                    'Content-Type': 'application/json',
+                    'x-api-key': (process.env.NEXT_PUBLIC_API_SECRET || '').trim()
+                },
                 body: JSON.stringify({ subscription, location: selectedLocation })
             });
 

@@ -9,10 +9,15 @@ export async function POST(request: Request) {
 
         if (!serverSecret) {
             console.error("❌ CRITICAL: API_SECRET is missing!");
-            return NextResponse.json({ success: false, message: 'Server config error' }, { status: 500 });
+            return NextResponse.json({
+                success: false,
+                message: 'Server config error: Missing API_SECRET',
+                diagnostics: 'Check Vercel environment variables'
+            }, { status: 500 });
         }
 
         if (apiKey !== serverSecret) {
+            console.warn(`[Auth_Fail] Delete attempt with invalid key: "${apiKey.substring(0, 3)}..."`);
             return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
         }
 
@@ -21,18 +26,27 @@ export async function POST(request: Request) {
             return NextResponse.json({ success: false, message: 'Missing booking ID' }, { status: 400 });
         }
 
+        console.log(`[API_Delete] Attempting to delete booking: ${id}`);
         const bookings = await getBookings();
         const initialLength = bookings.length;
         const filtered = bookings.filter(b => b.id !== id && b.id !== id.toString());
 
         if (filtered.length === initialLength) {
+            console.warn(`[API_Delete] Booking not found: ${id}`);
             return NextResponse.json({ success: false, message: 'Booking not found' }, { status: 404 });
         }
 
         await saveBookings(filtered);
+        console.log(`[API_Delete] Successfully deleted booking: ${id}`);
 
         return NextResponse.json({ success: true, message: 'Booking deleted' });
-    } catch (error) {
-        return NextResponse.json({ success: false, message: 'Internal Server Error' }, { status: 500 });
+    } catch (error: any) {
+        console.error("[API_Fatal] Error in delete-booking:", error);
+        return NextResponse.json({
+            success: false,
+            message: 'Internal Server Error',
+            error: error.message
+        }, { status: 500 });
     }
 }
+

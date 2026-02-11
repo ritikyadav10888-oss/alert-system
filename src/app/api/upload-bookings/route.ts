@@ -9,15 +9,23 @@ export async function POST(req: Request) {
     try {
         console.log('[Upload API] Received booking data...');
 
-        // Simple security check (Shared Secret)
-        const authHeader = req.headers.get('x-api-key');
-        if (authHeader !== process.env.API_SECRET_KEY) {
-            console.error('[Upload API] Invalid API Key');
-            // Allow dev mode bypass if needed, but safer to enforce
-            if (process.env.NODE_ENV === 'production' || authHeader !== 'dev-secret-123') {
-                return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
-            }
+        // Standardized security check (Shared Secret)
+        const apiKey = (req.headers.get('x-api-key') || '').trim();
+        const serverSecret = (process.env.API_SECRET || '').trim();
+
+        if (!serverSecret) {
+            console.error("❌ CRITICAL: API_SECRET is missing!");
+            return NextResponse.json({
+                success: false,
+                message: 'Server config error: Missing API_SECRET'
+            }, { status: 500 });
         }
+
+        if (apiKey !== serverSecret) {
+            console.error('[Upload API] Invalid API Key');
+            return NextResponse.json({ success: false, message: 'Unauthorized' }, { status: 401 });
+        }
+
 
         const body = await req.json();
         const { bookings } = body;
@@ -144,6 +152,11 @@ export async function POST(req: Request) {
 
     } catch (error: any) {
         console.error('[Upload API] Error:', error);
-        return NextResponse.json({ success: false, message: error.message }, { status: 500 });
+        return NextResponse.json({
+            success: false,
+            message: 'Internal Server Error',
+            error: error.message
+        }, { status: 500 });
     }
 }
+
