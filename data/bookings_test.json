@@ -1454,5 +1454,44 @@
     "paidAmount": "₹548",
     "message": "Booking Confirmed!(NEW)",
     "timestamp": "2026-01-16T04:51:40.000Z"
+  },
+  {
+    "id": "1731",
+    "platform": "Hudle",
+    "location": "Matoshree",
+    "bookingSlot": "1. Fri, Jan 16, 2026 7:30 PM - Fri, Jan 16, 2026 8:00 PM | 2. Fri, Jan 16, 2026 8:00 PM - Fri, Jan 16, 2026 8:30 PM | 3. Fri, Jan 16, 2026 8:30 PM - Fri, Jan 16, 2026 9:00 PM",
+    "gameDate": "Jan 16, 2026",
+    "gameTime": "7:30 PM - 9:00 PM",
+    "sport": "Pickleball",
+    "bookingName": "Ashdin",
+    "paidAmount": "₹900",
+    "message": "Hudle - Booking #HUD3670516102",
+    "timestamp": "2026-01-16T04:04:22.000Z"
+  },
+  {
+    "id": "1730",
+    "platform": "Hudle",
+    "location": "Matoshree",
+    "bookingSlot": "1. Thu, Jan 15, 2026 9:30 PM - Thu, Jan 15, 2026 10:00 PM | 2. Thu, Jan 15, 2026 10:00 PM - Thu, Jan 15, 2026 10:30 PM | 3. Thu, Jan 15, 2026 10:30 PM - Thu, Jan 15, 2026 11:00 PM",
+    "gameDate": "Jan 15, 2026",
+    "gameTime": "9:30 PM - 11:00 PM",
+    "sport": "Pickleball",
+    "bookingName": "Ravish",
+    "paidAmount": "₹900",
+    "message": "Hudle - Booking #HUD3602074610",
+    "timestamp": "2026-01-15T13:43:50.000Z"
+  },
+  {
+    "id": "1729",
+    "platform": "Hudle",
+    "location": "Dahisar",
+    "bookingSlot": "1. Fri, Jan 16, 2026 7:00 PM - Fri, Jan 16, 2026 7:30 PM | 2. Fri, Jan 16, 2026 7:30 PM - Fri, Jan 16, 2026 8:00 PM | 3. Fri, Jan 16, 2026 8:00 PM - Fri, Jan 16, 2026 8:30 PM | 4. Fri, Jan 16, 2026 8:30 PM - Fri, Jan 16, 2026 9:00 PM",
+    "gameDate": "Jan 16, 2026",
+    "gameTime": "7:00 PM - 9:00 PM",
+    "sport": "Cricket",
+    "bookingName": "Vaibhav",
+    "paidAmount": "N/A",
+    "message": "Hudle - Booking #HUD2233240860",
+    "timestamp": "2026-01-15T13:36:51.000Z"
   }
 ]
