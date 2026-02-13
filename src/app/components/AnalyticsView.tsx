@@ -35,6 +35,8 @@ export default function AnalyticsView({ data }: AnalyticsViewProps) {
         const revenueBySport: Record<string, number> = {};
         const revenueByLocation: Record<string, number> = {};
         const bookingsByHour: Record<number, number> = {};
+        const bookingsByPlatform: Record<string, number> = {};
+        const revenueByPlatform: Record<string, number> = {};
         let totalRevenue = 0;
         let todayRevenue = 0;
         const now = new Date();
@@ -72,11 +74,16 @@ export default function AnalyticsView({ data }: AnalyticsViewProps) {
                     bookingsByHour[hour] = (bookingsByHour[hour] || 0) + 1;
                 }
             }
+
+            // Bookings by Platform
+            const platform = booking.platform || 'Unknown';
+            bookingsByPlatform[platform] = (bookingsByPlatform[platform] || 0) + 1;
+            revenueByPlatform[platform] = (revenueByPlatform[platform] || 0) + amount;
         });
 
-        // Format for Recharts - Ensure chronological last 14 days
+        // Format for Recharts - Ensure chronological last 30 days
         const revenueData = [];
-        for (let i = 13; i >= 0; i--) {
+        for (let i = 29; i >= 0; i--) {
             const d = new Date();
             d.setDate(d.getDate() - i);
             const dateKey = d.toLocaleDateString('en-IN', { day: '2-digit', month: 'short' });
@@ -99,6 +106,14 @@ export default function AnalyticsView({ data }: AnalyticsViewProps) {
             count: bookingsByHour[i] || 0
         })).filter(h => h.count > 0 || (parseInt(h.hour) >= 6 && parseInt(h.hour) <= 23));
 
+        const platformData = Object.entries(bookingsByPlatform)
+            .map(([name, count]) => ({
+                name,
+                count,
+                revenue: revenueByPlatform[name] || 0
+            }))
+            .sort((a, b) => b.count - a.count);
+
         return {
             totalRevenue,
             todayRevenue,
@@ -106,6 +121,7 @@ export default function AnalyticsView({ data }: AnalyticsViewProps) {
             sportData,
             locationData,
             hourData,
+            platformData,
             bookingCount: data.length
         };
     }, [data]);
@@ -148,7 +164,7 @@ export default function AnalyticsView({ data }: AnalyticsViewProps) {
                 <div className={`${styles.chartCard} ${styles.wide}`}>
                     <div className={styles.chartHeader}>
                         <TrendingUp size={18} />
-                        <h3>Revenue Trend (Last 14 Days)</h3>
+                        <h3>Revenue Trend (Last 30 Days)</h3>
                     </div>
                     <div className={styles.chartBox}>
                         <ResponsiveContainer width="100%" height={250}>
@@ -197,6 +213,32 @@ export default function AnalyticsView({ data }: AnalyticsViewProps) {
                                 <Tooltip />
                                 <Legend verticalAlign="bottom" height={36} />
                             </PieChart>
+                        </ResponsiveContainer>
+                    </div>
+                </div>
+
+                {/* Bookings by Platform */}
+                <div className={styles.chartCard}>
+                    <div className={styles.chartHeader}>
+                        <Users size={18} />
+                        <h3>Bookings by Platform</h3>
+                    </div>
+                    <div className={styles.chartBox}>
+                        <ResponsiveContainer width="100%" height={200}>
+                            <BarChart data={stats.platformData}>
+                                <XAxis dataKey="name" stroke="rgba(255,255,255,0.4)" fontSize={11} tickLine={false} axisLine={false} />
+                                <YAxis stroke="rgba(255,255,255,0.4)" fontSize={11} tickLine={false} axisLine={false} />
+                                <Tooltip
+                                    cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                                    contentStyle={{ background: '#1a1a1a', border: 'none', borderRadius: '8px' }}
+                                    formatter={(value: any, name?: string) => {
+                                        if (name === 'count') return [value, 'Bookings'];
+                                        if (name === 'revenue') return [`₹${value.toLocaleString()}`, 'Revenue'];
+                                        return [value, name || ''];
+                                    }}
+                                />
+                                <Bar dataKey="count" fill="#8b5cf6" radius={[4, 4, 0, 0]} />
+                            </BarChart>
                         </ResponsiveContainer>
                     </div>
                 </div>

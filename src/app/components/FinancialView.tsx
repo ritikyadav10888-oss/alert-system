@@ -22,6 +22,7 @@ const FinancialView: React.FC<FinancialViewProps> = ({ bookings }) => {
     const financialData = useMemo(() => {
         let totalRevenue = 0;
         let platformBreakdown: Record<string, number> = {};
+        let platformBookingCount: Record<string, number> = {};
 
         bookings.forEach(b => {
             const amountStr = (b.paidAmount || '0').replace(/[^\d.]/g, '');
@@ -30,6 +31,7 @@ const FinancialView: React.FC<FinancialViewProps> = ({ bookings }) => {
             if (amount > 0) {
                 totalRevenue += amount;
                 platformBreakdown[b.platform] = (platformBreakdown[b.platform] || 0) + amount;
+                platformBookingCount[b.platform] = (platformBookingCount[b.platform] || 0) + 1;
             }
         });
 
@@ -44,7 +46,8 @@ const FinancialView: React.FC<FinancialViewProps> = ({ bookings }) => {
             gstOnFee,
             totalDeductions,
             netProfit,
-            platformBreakdown
+            platformBreakdown,
+            platformBookingCount
         };
     }, [bookings, platformCommissionRate, gstRate]);
 
@@ -164,25 +167,37 @@ const FinancialView: React.FC<FinancialViewProps> = ({ bookings }) => {
                 {/* 📊 PLATFORM BREAKDOWN */}
                 <div style={{ background: 'white', padding: '25px', borderRadius: '16px', border: '1px solid #e2e8f0' }}>
                     <h3 style={{ margin: '0 0 20px 0', fontSize: '1.25rem', color: '#1e293b', display: 'flex', alignItems: 'center', gap: '10px' }}>
-                        <PieChart size={20} color="#8b5cf6" /> Revenue by Platform
+                        <PieChart size={20} color="#8b5cf6" /> Bookings & Revenue by Platform
                     </h3>
                     <div style={{ display: 'flex', flexDirection: 'column', gap: '15px' }}>
-                        {Object.entries(financialData.platformBreakdown).sort((a, b) => b[1] - a[1]).map(([platform, amount], idx) => (
-                            <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
-                                <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#475569' }}>
-                                    {platform[0]}
-                                </div>
-                                <div style={{ flex: 1 }}>
-                                    <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
-                                        <span style={{ fontWeight: '600', color: '#334155' }}>{platform}</span>
-                                        <span style={{ fontWeight: 'bold' }}>{formatCurrency(amount)}</span>
+                        {Object.entries(financialData.platformBreakdown).sort((a, b) => b[1] - a[1]).map(([platform, amount], idx) => {
+                            const bookingCount = financialData.platformBookingCount[platform] || 0;
+                            const avgBookingValue = bookingCount > 0 ? amount / bookingCount : 0;
+                            return (
+                                <div key={idx} style={{ display: 'flex', alignItems: 'center', gap: '15px' }}>
+                                    <div style={{ width: '40px', height: '40px', borderRadius: '10px', background: '#f3f4f6', display: 'flex', alignItems: 'center', justifyContent: 'center', fontWeight: 'bold', color: '#475569' }}>
+                                        {platform[0]}
                                     </div>
-                                    <div style={{ width: '100%', height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
-                                        <div style={{ width: `${(amount / financialData.totalRevenue) * 100}%`, height: '100%', background: idx === 0 ? '#10b981' : idx === 1 ? '#3b82f6' : '#64748b', borderRadius: '4px' }}></div>
+                                    <div style={{ flex: 1 }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '5px' }}>
+                                            <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+                                                <span style={{ fontWeight: '600', color: '#334155' }}>{platform}</span>
+                                                <span style={{ fontSize: '0.75rem', padding: '2px 8px', background: '#f1f5f9', borderRadius: '12px', color: '#64748b', fontWeight: '600' }}>
+                                                    {bookingCount} booking{bookingCount !== 1 ? 's' : ''}
+                                                </span>
+                                            </div>
+                                            <span style={{ fontWeight: 'bold' }}>{formatCurrency(amount)}</span>
+                                        </div>
+                                        <div style={{ fontSize: '0.75rem', color: '#94a3b8', marginBottom: '5px' }}>
+                                            Avg: {formatCurrency(avgBookingValue)} per booking
+                                        </div>
+                                        <div style={{ width: '100%', height: '8px', background: '#f1f5f9', borderRadius: '4px', overflow: 'hidden' }}>
+                                            <div style={{ width: `${(amount / financialData.totalRevenue) * 100}%`, height: '100%', background: idx === 0 ? '#10b981' : idx === 1 ? '#3b82f6' : '#64748b', borderRadius: '4px' }}></div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        ))}
+                            );
+                        })}
                     </div>
                 </div>
             </div>
